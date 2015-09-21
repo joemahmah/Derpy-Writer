@@ -23,10 +23,17 @@
  */
 package hrcek.core;
 
+import java.util.Map;
+
 /**
  *
  * @author Michael Hrcek <hrcekmj@clarkson.edu>
  */
 public class Word {
+    
+    String name;
+    double rarity;
+    Map<Word,Integer> wordsPrior;
+    Map<Word,Integer> wordsAfter;
     
 }
