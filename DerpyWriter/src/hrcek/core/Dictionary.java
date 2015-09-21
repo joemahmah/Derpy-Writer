@@ -23,13 +23,14 @@
  */
 package hrcek.core;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author Michael Hrcek <hrcekmj@clarkson.edu>
  */
-public class Dictionary {
+public class Dictionary implements Serializable {
 
     private ArrayList<Word> words;
 

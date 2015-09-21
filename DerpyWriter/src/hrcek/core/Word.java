@@ -23,13 +23,14 @@
  */
 package hrcek.core;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
  *
  * @author Michael Hrcek <hrcekmj@clarkson.edu>
  */
-public class Word {
+public class Word implements Serializable {
 
     private String name;
     private int rarity;
