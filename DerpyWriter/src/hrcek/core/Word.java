@@ -33,12 +33,23 @@ public class Word {
 
     private String name;
     private int rarity;
-    private Map<Word, Integer> wordsPrior;
     private Map<Word, Integer> wordsAfter;
 
     public Word(String name) {
         this.name = name;
         this.rarity = 1;
+    }
+
+    public void increaseRarity() {
+        rarity++;
+    }
+
+    public void addWordAfter(Word word) {
+        if (wordsAfter.containsKey(word)) {
+            wordsAfter.put(word, wordsAfter.get(word));
+        } else {
+            wordsAfter.put(word, 1);
+        }
     }
 
     public String getName() {
