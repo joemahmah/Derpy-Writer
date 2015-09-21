@@ -30,10 +30,23 @@ import java.util.Map;
  * @author Michael Hrcek <hrcekmj@clarkson.edu>
  */
 public class Word {
-    
-    String name;
-    double rarity;
-    Map<Word,Integer> wordsPrior;
-    Map<Word,Integer> wordsAfter;
-    
+
+    private String name;
+    private int rarity;
+    private Map<Word, Integer> wordsPrior;
+    private Map<Word, Integer> wordsAfter;
+
+    public Word(String name) {
+        this.name = name;
+        this.rarity = 1;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getRarity() {
+        return rarity;
+    }
+
 }

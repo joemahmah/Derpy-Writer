@@ -30,7 +30,28 @@ import java.util.ArrayList;
  * @author Michael Hrcek <hrcekmj@clarkson.edu>
  */
 public class Dictionary {
-    
+
     private ArrayList<Word> words;
-    
+
+    public Word getWord(String name) {
+        for (Word word : words) {
+            if (word.getName().equals(name)) {
+                return word;
+            }
+        }
+
+        Word newWord = new Word(name);
+        words.add(newWord);
+        return newWord;
+    }
+
+    public boolean hasWord(String name) {
+        for (Word word : words) {
+            if (word.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
