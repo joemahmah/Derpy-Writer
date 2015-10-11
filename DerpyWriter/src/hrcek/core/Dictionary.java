@@ -65,5 +65,11 @@ public class Dictionary implements Serializable {
         }
         return false;
     }
+    
+    public void printContents(){
+        for(Word word: words){
+            System.out.println(word);
+        }
+    }
 
 }

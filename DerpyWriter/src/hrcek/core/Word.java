@@ -66,5 +66,9 @@ public class Word implements Serializable {
     public int getRarity() {
         return rarity;
     }
+    
+    public String toString(){
+        return name;
+    }
 
 }

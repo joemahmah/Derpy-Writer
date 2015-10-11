@@ -33,7 +33,14 @@ public class Boot {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        
+        Dictionary dictionary = new Dictionary();
+        DerpyReader derpyReader = new DerpyReader(dictionary);
+        derpyReader.setFileLocation("/mnt/home/fatman/Desktop/test");
+        
+        Thread t = new Thread(derpyReader);
+        t.start();
+        
     }
     
 }
