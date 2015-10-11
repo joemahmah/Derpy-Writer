@@ -47,12 +47,16 @@ public class Word implements Serializable {
 
     public void addWordAfter(Word word) {
         if (wordsAfter.containsKey(word)) {
-            wordsAfter.put(word, wordsAfter.get(word));
+            wordsAfter.put(word, wordsAfter.get(word)+1);
         } else {
             wordsAfter.put(word, 1);
         }
     }
-
+    
+    public Map<Word, Integer> getWordsAfter(){
+        return wordsAfter;
+    }
+    
     public String getName() {
         return name;
     }

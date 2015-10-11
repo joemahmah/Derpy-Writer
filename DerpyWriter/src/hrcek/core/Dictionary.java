@@ -32,9 +32,9 @@ import java.util.ArrayList;
  */
 public class Dictionary implements Serializable {
 
-    private ArrayList<Word> words;
+    private volatile ArrayList<Word> words;
 
-    public Word getWord(String name) {
+    public synchronized Word getWord(String name) {
         for (Word word : words) {
             if (word.getName().equals(name)) {
                 return word;
