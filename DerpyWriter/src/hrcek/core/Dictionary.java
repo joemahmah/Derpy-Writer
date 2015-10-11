@@ -25,6 +25,7 @@ package hrcek.core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -32,8 +33,18 @@ import java.util.ArrayList;
  */
 public class Dictionary implements Serializable {
 
-    private volatile ArrayList<Word> words;
+    private volatile List<Word> words;
+    private volatile Word lastWord;
 
+    public Dictionary() {
+        words = new ArrayList<>();
+        lastWord = new Word("NULL_WORD");
+    }
+    
+    public synchronized void addWord(String name) {
+        lastWord.addWordAfter(getWord(name));
+    }
+    
     public synchronized Word getWord(String name) {
         for (Word word : words) {
             if (word.getName().equals(name)) {

@@ -24,6 +24,7 @@
 package hrcek.core;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -39,6 +40,7 @@ public class Word implements Serializable {
     public Word(String name) {
         this.name = name;
         this.rarity = 1;
+        this.wordsAfter = new HashMap<>();
     }
 
     public void increaseRarity() {
