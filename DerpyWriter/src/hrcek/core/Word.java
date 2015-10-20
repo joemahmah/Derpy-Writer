@@ -24,7 +24,9 @@
 package hrcek.core;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,31 +36,36 @@ import java.util.Map;
 public class Word implements Serializable {
 
     public static Word wordNotFound = new Word("/dev/erg");
+    public static final int ACCURACY_NUMBER = 3;
     
     private String name;
     private int rarity;
-    private Map<Word, Integer> wordsAfter;
-
+    private List< Map<Word, Integer> > wordsAfter;
+    
     public Word(String name) {
         this.name = name;
         this.rarity = 1;
-        this.wordsAfter = new HashMap<>();
+        this.wordsAfter = new ArrayList<>();
+        
+        for(int i=0; i<ACCURACY_NUMBER; i++){
+            wordsAfter.add(new HashMap<Word, Integer>());
+        }
     }
 
     public void increaseRarity() {
         rarity++;
     }
 
-    public void addWordAfter(Word word) {
-        if (wordsAfter.containsKey(word)) {
-            wordsAfter.put(word, wordsAfter.get(word)+1);
+    public void addWordAfter(Word word, int index) {
+        if (wordsAfter.get(index).containsKey(word)) {
+            wordsAfter.get(index).put(word, wordsAfter.get(index).get(word)+1);
         } else {
-            wordsAfter.put(word, 1);
+            wordsAfter.get(index).put(word, 1);
         }
     }
     
-    public Map<Word, Integer> getWordsAfter(){
-        return wordsAfter;
+    public Map<Word, Integer> getWordsAfter(int index){
+        return wordsAfter.get(index);
     }
     
     public String getName() {
