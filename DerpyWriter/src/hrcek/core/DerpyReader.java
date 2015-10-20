@@ -72,7 +72,7 @@ public class DerpyReader implements Runnable {
                 String[] words = line.split(" ");
                 for (String word : words) {
                     if (word != "" && word != " ") {
-                        dictionary.addWord(word);
+                        dictionary.addWord(word.toLowerCase());
                     }
                 }
             }
@@ -85,11 +85,14 @@ public class DerpyReader implements Runnable {
         str = str.replaceAll(",", " ,");
         str = str.replaceAll("\\?", " ?");
         str = str.replaceAll("!", " !");
-        str = str.replaceAll("\"", " \" ");
-        str = str.replaceAll("\\(", " ( ");
-        str = str.replaceAll("\\)", " ) ");
+        str = str.replaceAll("\"", "");
+        str = str.replaceAll("\\(", "");
+        str = str.replaceAll("\\)", "");
         str = str.replaceAll(";", " ;");
         str = str.replaceAll("\t", " ");
+        str = str.replaceAll("\n", " ");
+        str = str.replaceAll(" - ", " ");
+        str = str.replaceAll("  ", " ");
         str = str.replaceAll("  ", " ");
         return str;
     }

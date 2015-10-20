@@ -28,23 +28,65 @@ package hrcek.core;
  * @author Michael Hrcek <hrcekmj@clarkson.edu>
  */
 public class DerpyWriter {
-    
+
     private Dictionary dictionary;
-    
-    public DerpyWriter(Dictionary dictionary){
+    private int targetSentencesPerParagraph;
+    private int tracebackCount;
+
+    public DerpyWriter(Dictionary dictionary) {
         this.dictionary = dictionary;
+        targetSentencesPerParagraph = 10;
+        tracebackCount = 0;
     }
-    
-    String generateStory(int wordCount){
+
+    public void setTargetSentencesPerParagraph(int targetSentencesPerParagraph) {
+        this.targetSentencesPerParagraph = targetSentencesPerParagraph;
+    }
+
+    String generateStory(int wordCount) {
         String story = "";
-        Word lastWord = LogicFactory.getRandomWord(dictionary);
-        
-        for(int i=0; i<wordCount; i++){
-            lastWord = LogicFactory.getRandomWord(lastWord);
-            story += lastWord.getName() + " ";
-            if(i % 250 == 249){story += "\n\n";}
+        int sentenceCount = 0;
+        Word[] lastWords = new Word[tracebackCount];
+
+        if (lastWords.length > 0) {
+            lastWords[0] = LogicFactory.getRandomWord(dictionary);
         }
-        
+
+        for (int i = 1; i < lastWords.length; i++) {
+            lastWords[i] = LogicFactory.getRandomWord(lastWords[i - 1]);
+        }
+
+        for (int i = 0; i < wordCount; i++) {
+            if (tracebackCount > 0) {
+                Word lastWord = LogicFactory.getRandomWord(lastWords);
+                
+                story += lastWord.getName() + " ";
+
+                if (LogicFactory.isSentenceEnd(lastWord)) {
+                    sentenceCount++;
+                }
+
+                if (sentenceCount >= targetSentencesPerParagraph) {
+                    story += "\n\n";
+                    sentenceCount = 0;
+                }
+            } else {
+                Word lastWord = LogicFactory.getRandomWord(dictionary);
+                
+                story +=  lastWord.getName() + " ";
+                
+                if (LogicFactory.isSentenceEnd(lastWord)) {
+                    sentenceCount++;
+                }
+
+                if (sentenceCount >= targetSentencesPerParagraph) {
+                    story += "\n\n";
+                    sentenceCount = 0;
+                }
+            }
+
+        }
+
         return story;
     }
     

@@ -36,7 +36,7 @@ public class Boot {
         
         Dictionary dictionary = new Dictionary();
         DerpyReader derpyReader = new DerpyReader(dictionary);
-        derpyReader.setFileLocation("/mnt/home/fatman/Desktop/test");
+        derpyReader.setFileLocation("/mnt/home/fatman/Desktop/books.txt");
         
         DerpyReader derpyReader2 = new DerpyReader(dictionary);
         derpyReader2.setFileLocation("/mnt/home/fatman/Desktop/test2");
@@ -47,7 +47,7 @@ public class Boot {
         t.run();
         
         DerpyWriter dw = new DerpyWriter(dictionary);
-        System.out.println(dw.generateStory(5000));
+        System.out.println(dw.generateStory(2500));
         
     }
     
