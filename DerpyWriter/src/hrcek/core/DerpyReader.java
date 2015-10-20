@@ -67,36 +67,37 @@ public class DerpyReader implements Runnable {
 
         while (fileReader.ready()) {
             String line = fileReader.readLine();
-            line = splitPunctuation(line);
-            String[] words = line.split(" ");
-            for(String word: words){
-                dictionary.addWord(word);
+            if (line.length() > 0) {
+                line = splitPunctuation(line);
+                String[] words = line.split(" ");
+                for (String word : words) {
+                    if (word != "" && word != " ") {
+                        dictionary.addWord(word);
+                    }
+                }
             }
-            dictionary.addWord(line);
         }
 
     }
-    
-    private String splitPunctuation(String str){
-            str = str.replaceAll("\\.", " .");
-            str = str.replaceAll(",", " ,");
-            str = str.replaceAll("\\?", " ?");
-            str = str.replaceAll("!", " !");
-            str = str.replaceAll("\\$", "$ ");
-            str = str.replaceAll("\"", " \" ");
-            str = str.replaceAll("\\(", " ( ");
-            str = str.replaceAll("\\)", " ) ");
-            str = str.replaceAll(";", " ;");
-            str = str.replaceAll("\t", " ");
-            str = str.replaceAll("  ", " ");
-            return str;
+
+    private String splitPunctuation(String str) {
+        str = str.replaceAll("\\.", " .");
+        str = str.replaceAll(",", " ,");
+        str = str.replaceAll("\\?", " ?");
+        str = str.replaceAll("!", " !");
+        str = str.replaceAll("\"", " \" ");
+        str = str.replaceAll("\\(", " ( ");
+        str = str.replaceAll("\\)", " ) ");
+        str = str.replaceAll(";", " ;");
+        str = str.replaceAll("\t", " ");
+        str = str.replaceAll("  ", " ");
+        return str;
     }
 
     @Override
     public void run() {
         try {
             readThroughFile();
-            dictionary.printContents();
         } catch (Exception e) {
             e.printStackTrace();
         }

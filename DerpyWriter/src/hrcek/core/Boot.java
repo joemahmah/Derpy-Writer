@@ -38,8 +38,16 @@ public class Boot {
         DerpyReader derpyReader = new DerpyReader(dictionary);
         derpyReader.setFileLocation("/mnt/home/fatman/Desktop/test");
         
+        DerpyReader derpyReader2 = new DerpyReader(dictionary);
+        derpyReader2.setFileLocation("/mnt/home/fatman/Desktop/test2");
+        
+        Thread t2 = new Thread(derpyReader2);
         Thread t = new Thread(derpyReader);
-        t.start();
+        t2.run();
+        t.run();
+        
+        DerpyWriter dw = new DerpyWriter(dictionary);
+        System.out.println(dw.generateStory(5000));
         
     }
     

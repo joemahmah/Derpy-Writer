@@ -33,6 +33,8 @@ import java.util.Map;
  */
 public class Word implements Serializable {
 
+    public static Word wordNotFound = new Word("/dev/erg");
+    
     private String name;
     private int rarity;
     private Map<Word, Integer> wordsAfter;

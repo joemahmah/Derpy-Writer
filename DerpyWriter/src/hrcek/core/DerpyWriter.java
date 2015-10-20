@@ -23,62 +23,29 @@
  */
 package hrcek.core;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  *
  * @author Michael Hrcek <hrcekmj@clarkson.edu>
  */
-public class Dictionary implements Serializable {
-
-    private volatile List<Word> words;
-    private volatile Word lastWord;
-
-    public Dictionary() {
-        words = new ArrayList<>();
-        lastWord = Word.wordNotFound;
+public class DerpyWriter {
+    
+    private Dictionary dictionary;
+    
+    public DerpyWriter(Dictionary dictionary){
+        this.dictionary = dictionary;
     }
     
-    public synchronized int getSize(){
-        return words.size();
-    }
-    
-    public synchronized Word getWord(int index){
-        return words.get(index);
-    }
-    
-    public synchronized void addWord(String name) {
-        lastWord.addWordAfter(getWord(name));
-        lastWord = getWord(name);
-    }
-    
-    public synchronized Word getWord(String name) {
-        for (Word word : words) {
-            if (word.getName().equals(name)) {
-                return word;
-            }
+    String generateStory(int wordCount){
+        String story = "";
+        Word lastWord = LogicFactory.getRandomWord(dictionary);
+        
+        for(int i=0; i<wordCount; i++){
+            lastWord = LogicFactory.getRandomWord(lastWord);
+            story += lastWord.getName() + " ";
+            if(i % 250 == 249){story += "\n\n";}
         }
-
-        Word newWord = new Word(name);
-        words.add(newWord);
-        return newWord;
-    }
-
-    public boolean hasWord(String name) {
-        for (Word word : words) {
-            if (word.getName().equals(name)) {
-                return true;
-            }
-        }
-        return false;
+        
+        return story;
     }
     
-    public synchronized void printContents(){
-        for(Word word: words){
-            System.out.println(word);
-        }
-    }
-
 }

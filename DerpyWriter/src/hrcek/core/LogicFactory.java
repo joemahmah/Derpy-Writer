@@ -32,35 +32,41 @@ import java.util.Random;
  * @author Michael Hrcek <hrcekmj@clarkson.edu>
  */
 public class LogicFactory {
-    
+
     private static Random random = new Random();
-    
-    public static int getRandomInt(){
+
+    public static int getRandomInt() {
         return random.nextInt();
     }
-    
-    public static int getRandomInt(int max){
+
+    public static int getRandomInt(int max) {
         return random.nextInt(max);
     }
-    
-    public static int getRandomInt(int min, int max){
+
+    public static int getRandomInt(int min, int max) {
         return min + getRandomInt(max);
     }
-    
-    public Word getRandomWord(Word currentWord){
+
+    public static Word getRandomWord(Word currentWord) {
         List<Word> wordList = new ArrayList();
-        
-        for(Word word : currentWord.getWordsAfter().keySet()){
-            
+
+        for (Word word : currentWord.getWordsAfter().keySet()) {
             int count = currentWord.getWordsAfter().get(word);
-            for(int i=0; i<count; i++){
+            for (int i = 0; i < count; i++) {
                 wordList.add(word);
             }
-            
+
         }
-        
-        return wordList.get(getRandomInt(wordList.size()));
-        
+
+        if (wordList.size() > 0) {
+            return wordList.get(getRandomInt(wordList.size()));
+        } else {
+            return Word.wordNotFound;
+        }
     }
-    
+
+    public static Word getRandomWord(Dictionary dictionary) {
+        return dictionary.getWord(getRandomInt(dictionary.getSize()));
+    }
+
 }
