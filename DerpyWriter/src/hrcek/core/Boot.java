@@ -45,8 +45,9 @@ public class Boot {
     public static int output = 100;
     public static String outputFile = null;
     public static int threads = 1;
-    public static void showUsage()
-    {
+    public static boolean ignorePunctuation = false;
+
+    public static void showUsage() {
         System.out.println("Usage:");
         System.out.println("java DerpyWriter <arguments>\n");
         System.out.println("          Arguments:");
@@ -56,138 +57,118 @@ public class Boot {
         System.out.println("          -h      --help    display this text");
         System.out.println("          -o                output file (default stdout, hyphen for stdout)");
         System.out.println("          -t                thread count (default 1)");
+        System.out.println("          -i                ignore logical punctuation checking.");
     }
+
     public static boolean isFilenameValid(String file) {
-      File f = new File(file);
-      try {
-         f.getCanonicalPath();
-         return true;
-      }
-      catch (IOException e) {
-         return false;
-      }
+        File f = new File(file);
+        try {
+            f.getCanonicalPath();
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
+
     public static void main(String[] args) throws InterruptedException {
         // Must have at least one source file
-        for(int i = 0; i<args.length; i++)
-        {
-            if(args[i].equals("-a"))
-            {
-                try{
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-a")) {
+                try {
                     accuracy = Integer.parseInt(args[++i]);
-                    if(accuracy<0)
-                    {
+                    if (accuracy < 0) {
                         System.out.println("Argument must be a positive integer");
                         System.exit(0);
                     }
-                }catch(Exception e)
-                {
+                } catch (Exception e) {
                     System.out.println("Argument must be a positive integer");
                     System.exit(0);
                 }
-            }else if(args[i].equals("-c"))
-            {
-                 try{
+            } else if (args[i].equals("-c")) {
+                try {
                     output = Integer.parseInt(args[++i]);
-                    if(output<0)
-                    {
+                    if (output < 0) {
                         System.out.println("Argument must be a positive integer");
                         System.exit(0);
                     }
-                }catch(Exception e)
-                {
+                } catch (Exception e) {
                     System.out.println("Argument must be a positive integer");
                     System.exit(0);
                 }
-            }else if(args[i].equals("-h")||args[i].equals("--help"))
-            {
+            } else if (args[i].equals("-h") || args[i].equals("--help")) {
                 showUsage();
                 System.exit(0);
-            }else if(args[i].equals("-o"))
-            {
-                if(!args[++i].equals("-"))
-                {
+            } else if (args[i].equals("-o")) {
+                if (!args[++i].equals("-")) {
                     outputFile = args[i];
                 }
-            }else if(args[i].equals("-t"))
-            {
-                try{
+            } else if (args[i].equals("-t")) {
+                try {
                     threads = Integer.parseInt(args[++i]);
-                    if(threads<1)
-                    {
+                    if (threads < 1) {
                         System.out.println("Argument must be a positive integer greater than 1");
                         System.exit(0);
                     }
-                }catch(Exception e)
-                {
+                } catch (Exception e) {
                     System.out.println("Argument must be a positive integer greater than 1");
                     System.exit(0);
                 }
-            }else{
+            } else if (args[i].equals("-i")) {
+                ignorePunctuation = true;
+            } else {
                 // Assume a relative path if not absolute
-                if(isFilenameValid(args[i]))
-                {
-                    if(new File(args[i]).exists())
-                    {
+                if (isFilenameValid(args[i])) {
+                    if (new File(args[i]).exists()) {
                         sources.add(new File(args[i]).getAbsolutePath());
                     }
-                }else{
-                    System.out.println("Invalid filename: "+args[i]);
+                } else {
+                    System.out.println("Invalid filename: " + args[i]);
                     System.exit(0);
                 }
             }
         }
-        if(sources.size()<1)
-        {
+        if (sources.size() < 1) {
             System.out.println("This requires at least one source file");
             showUsage();
             System.exit(0);
         }
         Word.setAccuracyNumber(accuracy); //2-3 for songs, more for texts
-        
+
         Dictionary dictionary = new Dictionary();
-        if(threads>1)
-        {
-            int count = sources.size()%threads;
-            for(int i = 0; i<count+1; i++)
-            {
+        if (threads > 1) {
+            int count = sources.size() % threads;
+            for (int i = 0; i < count + 1; i++) {
                 Thread t[] = new Thread[threads];
-                for(int o = 0; o<threads; o++)
-                {
-                    if((i*threads)+o>sources.size())
-                    {
+                for (int o = 0; o < threads; o++) {
+                    if ((i * threads) + o > sources.size()) {
                         break;
                     }
                     DerpyReader derpyReader = new DerpyReader(dictionary);
-                    derpyReader.setFileLocation(sources.get((i*threads)+o)); 
+                    derpyReader.setFileLocation(sources.get((i * threads) + o));
                     t[o] = new Thread(derpyReader);
                     t[o].run();
                 }
-                for(int o = 0; o<threads; o++)
-                {
-                    if((i*threads)+o>sources.size())
-                    {
+                for (int o = 0; o < threads; o++) {
+                    if ((i * threads) + o > sources.size()) {
                         break;
                     }
                     t[o].join();
                 }
             }
-        }else{
-            for(int i = 0; i<sources.size(); i++)
-            {
-               DerpyReader derpyReader = new DerpyReader(dictionary);
-               derpyReader.setFileLocation(sources.get(i)); 
-               derpyReader.run();
+        } else {
+            for (int i = 0; i < sources.size(); i++) {
+                DerpyReader derpyReader = new DerpyReader(dictionary);
+                derpyReader.setFileLocation(sources.get(i));
+                derpyReader.run();
             }
         }
-        
-        DerpyWriter.setIgnorePunctuation(true); //This will allow end punctuation to be placed close together. If this is not wanted, this value should be false...
+
+        DerpyWriter.setIgnorePunctuation(ignorePunctuation); //This will allow end punctuation to be placed close together. If this is not wanted, this value should be false...
         DerpyWriter dw = new DerpyWriter(dictionary);
         String outString = dw.generateStory(output).replaceAll(" \\.", ".").replaceAll(" \\,", ",").replaceAll(" !", "!");
-        if(outputFile == null)
-        {
+        if (outputFile == null) {
             System.out.println(dw);
-        }else{
+        } else {
             try {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outputFile)));
                 writer.write(outString);
@@ -196,7 +177,7 @@ public class Boot {
                 Logger.getLogger(Boot.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
     }
-    
+
 }
