@@ -77,7 +77,7 @@ public class Dictionary implements Serializable {
         return newWord;
     }
 
-    public boolean hasWord(String name) {
+    public synchronized boolean hasWord(String name) {
         for (Word word : words) {
             if (word.getName().equals(name)) {
                 return true;

@@ -29,7 +29,7 @@ package hrcek.core;
  */
 public class DerpyWriter {
 
-    private Dictionary dictionary;
+    private volatile Dictionary dictionary;
     private int targetSentencesPerParagraph;
     private boolean useRandom;
 

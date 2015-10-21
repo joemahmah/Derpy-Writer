@@ -38,11 +38,11 @@ public class Word implements Serializable {
     public static Word wordNotFound = new Word("/dev/erg",Short.MAX_VALUE);
     public static int accuracyNumber = 5;
     
-    private String name;
-    private int rarity;
-    private List< Map<Word, Integer> > wordsAfter;
+    private volatile String name;
+    private volatile int rarity;
+    private volatile List< Map<Word, Integer> > wordsAfter;
     
-    public static void setAccuracyNumber(int accuracyNumber){
+    public static synchronized void setAccuracyNumber(int accuracyNumber){
         Word.accuracyNumber = accuracyNumber;
     }
     
@@ -72,7 +72,7 @@ public class Word implements Serializable {
         rarity++;
     }
 
-    public void addWordAfter(Word word, int index) {
+    public synchronized void addWordAfter(Word word, int index) {
         if (wordsAfter.get(index).containsKey(word)) {
             wordsAfter.get(index).put(word, wordsAfter.get(index).get(word)+1);
         } else {
@@ -80,19 +80,19 @@ public class Word implements Serializable {
         }
     }
     
-    public Map<Word, Integer> getWordsAfter(int index){
+    public synchronized Map<Word, Integer> getWordsAfter(int index){
         return wordsAfter.get(index);
     }
     
-    public String getName() {
+    public synchronized String getName() {
         return name;
     }
 
-    public int getRarity() {
+    public synchronized int getRarity() {
         return rarity;
     }
     
-    public String toString(){
+    public synchronized String toString(){
         return name;
     }
 

@@ -33,21 +33,21 @@ import java.util.Random;
  */
 public class LogicFactory {
 
-    private static Random random = new Random();
+    private static volatile Random random = new Random();
 
-    public static int getRandomInt() {
+    public static synchronized int getRandomInt() {
         return random.nextInt();
     }
 
-    public static int getRandomInt(int max) {
+    public static synchronized int getRandomInt(int max) {
         return random.nextInt(max);
     }
 
-    public static int getRandomInt(int min, int max) {
+    public static synchronized int getRandomInt(int min, int max) {
         return min + getRandomInt(max);
     }
 
-    public static boolean getBoolean(int num, int denom) {
+    public static synchronized boolean getBoolean(int num, int denom) {
         int i = getRandomInt(denom);
         if (i < num) {
             return true;
@@ -56,7 +56,7 @@ public class LogicFactory {
         return false;
     }
 
-    public static Word getRandomWord(Word[] currentWord, Dictionary dictionary) {
+    public synchronized static Word getRandomWord(Word[] currentWord, Dictionary dictionary) {
         List<Word> wordList = new ArrayList();
 
         for (Word word : currentWord[0].getWordsAfter(0).keySet()) {
@@ -92,11 +92,11 @@ public class LogicFactory {
 
     }
 
-    public static Word getRandomWord(Dictionary dictionary) {
+    public synchronized static Word getRandomWord(Dictionary dictionary) {
         return dictionary.getWord(getRandomInt(dictionary.getSize()));
     }
 
-    public static boolean isSentenceEnd(Word word) {
+    public synchronized static boolean isSentenceEnd(Word word) {
 
         if (word.getName().equals(".") || word.getName().equals("!") || word.getName().equals("?") || word.getName().equals("...")) {
             return true;
