@@ -94,6 +94,7 @@ public class DerpyReader implements Runnable {
         str = str.replaceAll(" - ", " ");
         str = str.replaceAll("  ", " ");
         str = str.replaceAll("  ", " ");
+        str = str.replaceAll(":", "");
         return str;
     }
 

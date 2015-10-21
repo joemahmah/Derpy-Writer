@@ -34,26 +34,37 @@ import java.util.List;
 public class Dictionary implements Serializable {
 
     private volatile List<Word> words;
-    private volatile Word lastWord;
+    private volatile List<Word> lastWords;
 
     public Dictionary() {
         words = new ArrayList<>();
-        lastWord = Word.wordNotFound;
+        lastWords = new ArrayList<Word>();
+
+        for (int i = 0; i < Word.accuracyNumber; i++) {
+            lastWords.add(Word.wordNotFound);
+        }
+
     }
-    
-    public synchronized int getSize(){
+
+    public synchronized int getSize() {
         return words.size();
     }
-    
-    public synchronized Word getWord(int index){
+
+    public synchronized Word getWord(int index) {
         return words.get(index);
     }
-    
+
     public synchronized void addWord(String name) {
-        lastWord.addWordAfter(getWord(name));
-        lastWord = getWord(name);
+        for (int i = Word.accuracyNumber - 1; i >= 0; i--) {
+            lastWords.get(i).addWordAfter(getWord(name),i);
+        }
+        
+        for(int i = Word.accuracyNumber -1; i > 0; i--){
+            lastWords.set(i,lastWords.get(i-1));
+        }
+        lastWords.set(0, getWord(name));
     }
-    
+
     public synchronized Word getWord(String name) {
         for (Word word : words) {
             if (word.getName().equals(name)) {
@@ -74,9 +85,9 @@ public class Dictionary implements Serializable {
         }
         return false;
     }
-    
-    public synchronized void printContents(){
-        for(Word word: words){
+
+    public synchronized void printContents() {
+        for (Word word : words) {
             System.out.println(word);
         }
     }

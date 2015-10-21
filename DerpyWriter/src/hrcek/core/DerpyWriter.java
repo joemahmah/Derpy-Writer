@@ -31,12 +31,22 @@ public class DerpyWriter {
 
     private Dictionary dictionary;
     private int targetSentencesPerParagraph;
-    private int tracebackCount;
+    private boolean useRandom;
 
+    private static boolean ignorePunctuation = false;
+    
+    public static void setIgnorePunctuation(boolean ignorePunctuation){
+        DerpyWriter.ignorePunctuation = ignorePunctuation;
+    }
+    
+    public static boolean ignoresPunctuation(){
+        return ignorePunctuation;
+    }
+    
     public DerpyWriter(Dictionary dictionary) {
         this.dictionary = dictionary;
-        targetSentencesPerParagraph = 10;
-        tracebackCount = 0;
+        targetSentencesPerParagraph = 5;
+        useRandom = false;
     }
 
     public void setTargetSentencesPerParagraph(int targetSentencesPerParagraph) {
@@ -46,20 +56,16 @@ public class DerpyWriter {
     String generateStory(int wordCount) {
         String story = "";
         int sentenceCount = 0;
-        Word[] lastWords = new Word[tracebackCount];
+        Word[] lastWords = new Word[Word.accuracyNumber];
 
-        if (lastWords.length > 0) {
-            lastWords[0] = LogicFactory.getRandomWord(dictionary);
-        }
-
-        for (int i = 1; i < lastWords.length; i++) {
-            lastWords[i] = LogicFactory.getRandomWord(lastWords[i - 1]);
+        for (int i = 0; i < lastWords.length; i++) {
+            lastWords[i] = LogicFactory.getRandomWord(dictionary);
         }
 
         for (int i = 0; i < wordCount; i++) {
-            if (tracebackCount > 0) {
-                Word lastWord = LogicFactory.getRandomWord(lastWords);
-                
+            if (!useRandom) {
+                Word lastWord = LogicFactory.getRandomWord(lastWords, dictionary);
+
                 story += lastWord.getName() + " ";
 
                 if (LogicFactory.isSentenceEnd(lastWord)) {
@@ -72,9 +78,9 @@ public class DerpyWriter {
                 }
             } else {
                 Word lastWord = LogicFactory.getRandomWord(dictionary);
-                
-                story +=  lastWord.getName() + " ";
-                
+
+                story += lastWord.getName() + " ";
+
                 if (LogicFactory.isSentenceEnd(lastWord)) {
                     sentenceCount++;
                 }
@@ -89,5 +95,5 @@ public class DerpyWriter {
 
         return story;
     }
-    
+
 }

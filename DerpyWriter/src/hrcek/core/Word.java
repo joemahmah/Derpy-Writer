@@ -35,21 +35,37 @@ import java.util.Map;
  */
 public class Word implements Serializable {
 
-    public static Word wordNotFound = new Word("/dev/erg");
-    public static final int ACCURACY_NUMBER = 3;
+    public static Word wordNotFound = new Word("/dev/erg",Short.MAX_VALUE);
+    public static int accuracyNumber = 5;
     
     private String name;
     private int rarity;
     private List< Map<Word, Integer> > wordsAfter;
+    
+    public static void setAccuracyNumber(int accuracyNumber){
+        Word.accuracyNumber = accuracyNumber;
+    }
     
     public Word(String name) {
         this.name = name;
         this.rarity = 1;
         this.wordsAfter = new ArrayList<>();
         
-        for(int i=0; i<ACCURACY_NUMBER; i++){
+        for(int i=0; i<accuracyNumber; i++){
             wordsAfter.add(new HashMap<Word, Integer>());
         }
+        
+    }
+    
+    public Word(String name, int size) {
+        this.name = name;
+        this.rarity = 1;
+        this.wordsAfter = new ArrayList<>();
+        
+        for(int i=0; i<size; i++){
+            wordsAfter.add(new HashMap<Word, Integer>());
+        }
+        
     }
 
     public void increaseRarity() {

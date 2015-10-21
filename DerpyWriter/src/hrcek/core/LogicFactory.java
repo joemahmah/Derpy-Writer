@@ -56,60 +56,40 @@ public class LogicFactory {
         return false;
     }
 
-    public static Word getRandomWord(Word currentWord) {
+    public static Word getRandomWord(Word[] currentWord, Dictionary dictionary) {
         List<Word> wordList = new ArrayList();
 
-        for (Word word : currentWord.getWordsAfter().keySet()) {
-            int count = currentWord.getWordsAfter().get(word);
+        for (Word word : currentWord[0].getWordsAfter(0).keySet()) {
+            int count = currentWord[0].getWordsAfter(0).get(word);
             for (int i = 0; i < count; i++) {
                 wordList.add(word);
             }
 
         }
 
-        if (wordList.size() > 0) {
-            return wordList.get(getRandomInt(wordList.size()));
-        } else {
-            return Word.wordNotFound;
-        }
-    }
-
-    public static Word getRandomWord(Word[] words) {
-        List<Word> wordList = new ArrayList();
-
-        for (Word word : words[0].getWordsAfter().keySet()) {
-            int count = words[0].getWordsAfter().get(word);
-            for (int i = 0; i < count; i++) {
-                wordList.add(word);
-            }
-
-        }
-
-        List<Word> wordsToAdd = new ArrayList<>();
-        
-        for (int i = 1; i < words.length; i++) {
-            for (Word wordListWord : wordList) {
-                for (Word wordsKeySetWord : words[i].getWordsAfter().keySet()) {
-                    if (wordListWord == wordsKeySetWord){// || getBoolean(1, 1024)) {
-                        wordsToAdd.add(wordListWord);
+        for (int i = 1; i < Word.accuracyNumber; i++) {
+            for (Word word : currentWord[i].getWordsAfter(i).keySet()) {
+                int count = currentWord[i].getWordsAfter(i).get(word);
+                for (int j = 0; j < count && wordList.contains(word); j++) {
+                    if ((!word.equals(dictionary.getWord(".")) && !word.equals(dictionary.getWord("!")) && !word.equals(dictionary.getWord("?"))) || DerpyWriter.ignoresPunctuation()) {
+                        wordList.add(word);
                     }
                 }
             }
         }
-        
-        wordList.addAll(wordsToAdd);
 
-        for (int i = words.length - 1; i > 0; i--) {
-            words[i] = words[i - 1];
+        for (int i = Word.accuracyNumber - 1; i > 0; i--) {
+            currentWord[i] = currentWord[i - 1];
         }
 
         if (wordList.size() > 0) {
-            words[0] = wordList.get(getRandomInt(wordList.size()));
-            return wordList.get(getRandomInt(wordList.size()));
+            currentWord[0] = wordList.get(getRandomInt(wordList.size()));
+            return currentWord[0];
         } else {
-            words[0] = Word.wordNotFound;
+            currentWord[0] = Word.wordNotFound;
             return Word.wordNotFound;
         }
+
     }
 
     public static Word getRandomWord(Dictionary dictionary) {

@@ -34,20 +34,23 @@ public class Boot {
      */
     public static void main(String[] args) {
         
+        Word.setAccuracyNumber(1); //2-3 for songs, more for texts
+        
         Dictionary dictionary = new Dictionary();
         DerpyReader derpyReader = new DerpyReader(dictionary);
         derpyReader.setFileLocation("/mnt/home/fatman/Desktop/books.txt");
         
         DerpyReader derpyReader2 = new DerpyReader(dictionary);
-        derpyReader2.setFileLocation("/mnt/home/fatman/Desktop/test2");
+        derpyReader2.setFileLocation("/mnt/home/fatman/Desktop/cm.txt");
         
         Thread t2 = new Thread(derpyReader2);
         Thread t = new Thread(derpyReader);
         t2.run();
         t.run();
         
+        DerpyWriter.setIgnorePunctuation(true); //This will allow end punctuation to be placed close together. If this is not wanted, this value should be false...
         DerpyWriter dw = new DerpyWriter(dictionary);
-        System.out.println(dw.generateStory(2500));
+        System.out.println(dw.generateStory(2500).replaceAll(" \\.", ".").replaceAll(" \\,", ",").replaceAll(" !", "!"));
         
     }
     
