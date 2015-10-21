@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 /**
  *
  * @author Michael Hrcek <hrcekmj@clarkson.edu>
+ * @author Xperia64
  */
 public class Boot {
 
