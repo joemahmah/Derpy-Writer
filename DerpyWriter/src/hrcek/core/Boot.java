@@ -50,6 +50,7 @@ public class Boot {
      */
     public static ArrayList<String> sources = new ArrayList<String>();
     public static int accuracy = 1;
+    public static int accuracy_write = 0;
     public static int output = 100;
     public static String outputFile = null;
     public static String inputDictionary = null;
@@ -57,6 +58,7 @@ public class Boot {
     public static int threads = 1;
     public static boolean ignorePunctuation = false;
     public static boolean write = true;
+    public static boolean verbose = false;
 
     public static void showUsage() {
         System.out.println("Usage:");
@@ -72,6 +74,7 @@ public class Boot {
         System.out.println("\t-l [FILE]         load dictionary file.");
         System.out.println("\t-s [FILE]         save dictionary file.");
         System.out.println("\t-r                only read files.");
+        System.out.println("\t-v                verbose mode");
     }
 
     public static boolean isFilenameValid(String file) {
@@ -89,9 +92,7 @@ public class Boot {
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-a")) {
                 try {
-                    if (accuracy == 1) {
-                        accuracy = Integer.parseInt(args[++i]);
-                    }
+                    accuracy = Integer.parseInt(args[++i]);
                     if (accuracy < 0) {
                         System.out.println("Argument must be a positive integer");
                         System.exit(0);
@@ -122,6 +123,8 @@ public class Boot {
                 if (!args[++i].equals("-")) {
                     inputDictionary = args[i];
                 }
+            } else if (args[i].equals("-v")) {
+                verbose = true;
             } else if (args[i].equals("-s")) {
                 if (!args[++i].equals("-")) {
                     outputDictionary = args[i];
@@ -163,75 +166,149 @@ public class Boot {
 
         if (inputDictionary != null) {
             try {
-                System.out.println("Loading dictionary...");
+                if (verbose) {
+                    System.out.println("Loading dictionary...");
+                }
+
                 ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(new File(inputDictionary))));
                 accuracy = ois.readInt();
+
+                if (verbose) {
+                    System.out.println("Dictionary accuracy read... " + accuracy);
+                    System.out.println("Reading words...");
+                }
 
                 boolean hasWords = true;
                 while (hasWords) {
                     try {
                         dictionary.addWord((Word) ois.readObject());
                     } catch (Exception e) {
+                        if (verbose) {
+                            System.out.println("Finished reading words...");
+                            System.out.println("Total word count: " + dictionary.getSize());
+                        }
                         hasWords = false;
                     }
                 }
                 ois.close();
             } catch (IOException e) {
                 e.printStackTrace();
-                System.err.println("Dictionary not found! Using empty dictionary...");
+                if (verbose) {
+                    System.out.println("The dictionary at " + inputDictionary + " could not be loaded...");
+                    System.out.println("Using empty dictionary!");
+                } else {
+                    System.err.println("Dictionary not found! Using empty dictionary...");
+                }
             }
         }
 
+        
+        if(verbose){
+            System.out.println("Setting accuracy to " + accuracy + "...");
+        }
         Word.setAccuracyNumber(accuracy); //2-3 for songs, more for texts
         dictionary.regenerateLastWords();
-        
-        if (threads > 1) {
-            int count = sources.size() % threads;
-            for (int i = 0; i < count + 1; i++) {
-                Thread t[] = new Thread[threads];
-                for (int o = 0; o < threads; o++) {
-                    if ((i * threads) + o > sources.size()) {
-                        break;
+
+        if (sources.size() != 0) {
+            if(verbose){
+                System.out.println("Sources detected...");
+            }
+            if (threads > 1) {
+                if(verbose){
+                    System.out.println("Distributing work over " + threads + "threads...");
+                }
+                int count = sources.size() % threads;
+                for (int i = 0; i < count + 1; i++) {
+                    Thread t[] = new Thread[threads];
+                    for (int o = 0; o < threads; o++) {
+                        if ((i * threads) + o > sources.size()) {
+                            break;
+                        }
+                        DerpyReader derpyReader = new DerpyReader(dictionary);
+                        derpyReader.setFileLocation(sources.get((i * threads) + o));
+                        t[o] = new Thread(derpyReader);
+                        t[o].run();
                     }
+                    for (int o = 0; o < threads; o++) {
+                        if ((i * threads) + o > sources.size()) {
+                            break;
+                        }
+                        t[o].join();
+                    }
+                    if(verbose){
+                        System.out.println("Sources read...");
+                    }
+                }
+            } else {
+                for (int i = 0; i < sources.size(); i++) {
                     DerpyReader derpyReader = new DerpyReader(dictionary);
-                    derpyReader.setFileLocation(sources.get((i * threads) + o));
-                    t[o] = new Thread(derpyReader);
-                    t[o].run();
+                    derpyReader.setFileLocation(sources.get(i));
+                    derpyReader.run();
                 }
-                for (int o = 0; o < threads; o++) {
-                    if ((i * threads) + o > sources.size()) {
-                        break;
-                    }
-                    t[o].join();
-                }
+                if(verbose){
+                System.out.println("Sources read...");
+            }
             }
         } else {
-            for (int i = 0; i < sources.size(); i++) {
-                DerpyReader derpyReader = new DerpyReader(dictionary);
-                derpyReader.setFileLocation(sources.get(i));
-                derpyReader.run();
+            if(verbose){
+                System.out.println("No sources detected...");
+            }
+            if (Word.accuracyNumber > accuracy_write && accuracy_write != 0) {
+                if(verbose){
+                    System.out.println("Requested accuracy is within acceptable parameters...");
+                    System.out.println("Setting accuracy to " + accuracy_write);
+                }
+                Word.setAccuracyNumber(accuracy_write);
+                dictionary.regenerateLastWords();
             }
         }
 
         if (write) {
+            if(verbose){
+                System.out.println("Writing...");
+            }
             DerpyWriter.setIgnorePunctuation(ignorePunctuation); //This will allow end punctuation to be placed close together. If this is not wanted, this value should be false...
             DerpyWriter dw = new DerpyWriter(dictionary);
             String outString = dw.generateStory(output).replaceAll(" \\.", ".").replaceAll(" \\,", ",").replaceAll(" !", "!");
+            
+            if(verbose){
+                System.out.println("Story created...");
+                System.out.println("Determining write location...");
+            }
+            
             if (outputFile == null) {
+                if(verbose){
+                    System.out.println("Write location not found...);");
+                    System.out.println("Dumping to console!\n");
+                }
                 System.out.println(dw);
+                if(verbose){
+                    System.out.println("\n");
+                }
             } else {
                 try {
+                    if(verbose){
+                        System.out.println("Dumping story to file...");
+                    }
                     BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outputFile)));
                     writer.write(outString);
                     writer.close();
+                    if(verbose){
+                        System.out.println("Finished dumping story...");
+                    }
                 } catch (IOException ex) {
                     Logger.getLogger(Boot.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+        } else if(!write && verbose){
+            System.out.println("Write skipped...");
         }
 
         if (outputDictionary != null) {
             try {
+                if(verbose){
+                    System.out.println("Dumping dictionary...");
+                }
                 ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(outputDictionary))));
                 oos.writeInt(Word.accuracyNumber);
                 for (Word word : dictionary.getWordList()) {
@@ -239,6 +316,9 @@ public class Boot {
                     oos.flush();
                 }
                 oos.close();
+                if(verbose){
+                    System.out.println("Dictionary dumped...");
+                }
             } catch (IOException e) {
                 System.err.println("Unable to save file! Ignoring any changes made!");
             }
