@@ -93,6 +93,7 @@ public class Boot {
             if (args[i].equals("-a")) {
                 try {
                     accuracy = Integer.parseInt(args[++i]);
+                    accuracy_write = accuracy;
                     if (accuracy < 0) {
                         System.out.println("Argument must be a positive integer");
                         System.exit(0);
@@ -202,19 +203,18 @@ public class Boot {
             }
         }
 
-        
-        if(verbose){
+        if (verbose) {
             System.out.println("Setting accuracy to " + accuracy + "...");
         }
         Word.setAccuracyNumber(accuracy); //2-3 for songs, more for texts
         dictionary.regenerateLastWords();
 
         if (sources.size() != 0) {
-            if(verbose){
+            if (verbose) {
                 System.out.println("Sources detected...");
             }
             if (threads > 1) {
-                if(verbose){
+                if (verbose) {
                     System.out.println("Distributing work over " + threads + "threads...");
                 }
                 int count = sources.size() % threads;
@@ -235,7 +235,7 @@ public class Boot {
                         }
                         t[o].join();
                     }
-                    if(verbose){
+                    if (verbose) {
                         System.out.println("Sources read...");
                     }
                 }
@@ -245,68 +245,68 @@ public class Boot {
                     derpyReader.setFileLocation(sources.get(i));
                     derpyReader.run();
                 }
-                if(verbose){
-                System.out.println("Sources read...");
-            }
-            }
-        } else {
-            if(verbose){
-                System.out.println("No sources detected...");
-            }
-            if (Word.accuracyNumber > accuracy_write && accuracy_write != 0) {
-                if(verbose){
-                    System.out.println("Requested accuracy is within acceptable parameters...");
-                    System.out.println("Setting accuracy to " + accuracy_write);
+                if (verbose) {
+                    System.out.println("Sources read...");
                 }
-                Word.setAccuracyNumber(accuracy_write);
-                dictionary.regenerateLastWords();
             }
         }
 
+        if (Word.accuracyNumber > accuracy_write && accuracy_write != 0) {
+            if (verbose) {
+                System.out.println("Requested accuracy is within acceptable parameters...");
+                System.out.println("Setting accuracy to " + accuracy_write);
+            }
+            Word.setAccuracyNumber(accuracy_write);
+            dictionary.regenerateLastWords();
+        }
+
         if (write) {
-            if(verbose){
+            if (verbose) {
                 System.out.println("Writing...");
+                if(ignorePunctuation){
+                    System.out.println("Ignoring logical punctuation...");
+                }
             }
             DerpyWriter.setIgnorePunctuation(ignorePunctuation); //This will allow end punctuation to be placed close together. If this is not wanted, this value should be false...
             DerpyWriter dw = new DerpyWriter(dictionary);
-            String outString = dw.generateStory(output).replaceAll(" \\.", ".").replaceAll(" \\,", ",").replaceAll(" !", "!");
-            
-            if(verbose){
+            String outString = dw.generateStory(output).replaceAll(" \\.", ".").replaceAll(" \\,", ",").replaceAll(" !", "!") + "\n";
+
+            if (verbose) {
                 System.out.println("Story created...");
                 System.out.println("Determining write location...");
             }
-            
+
             if (outputFile == null) {
-                if(verbose){
+                if (verbose) {
                     System.out.println("Write location not found...);");
                     System.out.println("Dumping to console!\n");
                 }
                 System.out.println(dw);
-                if(verbose){
+                if (verbose) {
                     System.out.println("\n");
                 }
             } else {
                 try {
-                    if(verbose){
+                    if (verbose) {
                         System.out.println("Dumping story to file...");
                     }
                     BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outputFile)));
                     writer.write(outString);
                     writer.close();
-                    if(verbose){
+                    if (verbose) {
                         System.out.println("Finished dumping story...");
                     }
                 } catch (IOException ex) {
                     Logger.getLogger(Boot.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        } else if(!write && verbose){
+        } else if (!write && verbose) {
             System.out.println("Write skipped...");
         }
 
         if (outputDictionary != null) {
             try {
-                if(verbose){
+                if (verbose) {
                     System.out.println("Dumping dictionary...");
                 }
                 ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(outputDictionary))));
@@ -316,7 +316,7 @@ public class Boot {
                     oos.flush();
                 }
                 oos.close();
-                if(verbose){
+                if (verbose) {
                     System.out.println("Dictionary dumped...");
                 }
             } catch (IOException e) {
