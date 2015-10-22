@@ -59,20 +59,20 @@ public class LogicFactory {
     public synchronized static Word getRandomWord(Word[] currentWord, Dictionary dictionary) {
         List<Word> wordList = new ArrayList();
 
-        for (Word word : currentWord[0].getWordsAfter(0).keySet()) {
+        for (String word : currentWord[0].getWordsAfter(0).keySet()) {
             int count = currentWord[0].getWordsAfter(0).get(word);
             for (int i = 0; i < count; i++) {
-                wordList.add(word);
+                wordList.add(dictionary.getWord(word));
             }
 
         }
 
         for (int i = 1; i < Word.accuracyNumber; i++) {
-            for (Word word : currentWord[i].getWordsAfter(i).keySet()) {
+            for (String word : currentWord[i].getWordsAfter(i).keySet()) {
                 int count = currentWord[i].getWordsAfter(i).get(word);
                 for (int j = 0; j < count && wordList.contains(word); j++) {
                     if ((!word.equals(dictionary.getWord(".")) && !word.equals(dictionary.getWord("!")) && !word.equals(dictionary.getWord("?"))) || DerpyWriter.ignoresPunctuation()) {
-                        wordList.add(word);
+                        wordList.add(dictionary.getWord(word));
                     }
                 }
             }

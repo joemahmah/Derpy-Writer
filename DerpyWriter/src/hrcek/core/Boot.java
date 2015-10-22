@@ -23,10 +23,17 @@
  */
 package hrcek.core;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
+import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,20 +52,26 @@ public class Boot {
     public static int accuracy = 1;
     public static int output = 100;
     public static String outputFile = null;
+    public static String inputDictionary = null;
+    public static String outputDictionary = null;
     public static int threads = 1;
     public static boolean ignorePunctuation = false;
+    public static boolean write = true;
 
     public static void showUsage() {
         System.out.println("Usage:");
         System.out.println("java DerpyWriter <arguments>\n");
-        System.out.println("          Arguments:");
-        System.out.println("          <source files>    plaintext files used for source");
-        System.out.println("          -a                accuracy (default 1)");
-        System.out.println("          -c                output count (default 100)");
-        System.out.println("          -h      --help    display this text");
-        System.out.println("          -o                output file (default stdout, hyphen for stdout)");
-        System.out.println("          -t                thread count (default 1)");
-        System.out.println("          -i                ignore logical punctuation checking.");
+        System.out.println("\tArguments:");
+        System.out.println("\t<source files>    plaintext files used for source");
+        System.out.println("\t-a [#]            accuracy (default 1)");
+        System.out.println("\t-c [#]            output count (default 100)");
+        System.out.println("\t-h      --help    display this text");
+        System.out.println("\t-o [FILE]         output file (default stdout, hyphen for stdout)");
+        System.out.println("\t-t [#]            thread count (default 1)");
+        System.out.println("\t-i                ignore logical punctuation checking.");
+        System.out.println("\t-l [FILE]         load dictionary file.");
+        System.out.println("\t-s [FILE]         save dictionary file.");
+        System.out.println("\t-r                only read files.");
     }
 
     public static boolean isFilenameValid(String file) {
@@ -76,7 +89,9 @@ public class Boot {
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-a")) {
                 try {
-                    accuracy = Integer.parseInt(args[++i]);
+                    if (accuracy == 1) {
+                        accuracy = Integer.parseInt(args[++i]);
+                    }
                     if (accuracy < 0) {
                         System.out.println("Argument must be a positive integer");
                         System.exit(0);
@@ -103,6 +118,14 @@ public class Boot {
                 if (!args[++i].equals("-")) {
                     outputFile = args[i];
                 }
+            } else if (args[i].equals("-l")) {
+                if (!args[++i].equals("-")) {
+                    inputDictionary = args[i];
+                }
+            } else if (args[i].equals("-s")) {
+                if (!args[++i].equals("-")) {
+                    outputDictionary = args[i];
+                }
             } else if (args[i].equals("-t")) {
                 try {
                     threads = Integer.parseInt(args[++i]);
@@ -116,6 +139,8 @@ public class Boot {
                 }
             } else if (args[i].equals("-i")) {
                 ignorePunctuation = true;
+            } else if (args[i].equals("-r")) {
+                write = false;
             } else {
                 // Assume a relative path if not absolute
                 if (isFilenameValid(args[i])) {
@@ -128,14 +153,38 @@ public class Boot {
                 }
             }
         }
-        if (sources.size() < 1) {
+        if (sources.size() < 1 && inputDictionary == null) {
             System.out.println("This requires at least one source file");
             showUsage();
             System.exit(0);
         }
-        Word.setAccuracyNumber(accuracy); //2-3 for songs, more for texts
 
         Dictionary dictionary = new Dictionary();
+
+        if (inputDictionary != null) {
+            try {
+                System.out.println("Loading dictionary...");
+                ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(new File(inputDictionary))));
+                accuracy = ois.readInt();
+
+                boolean hasWords = true;
+                while (hasWords) {
+                    try {
+                        dictionary.addWord((Word) ois.readObject());
+                    } catch (Exception e) {
+                        hasWords = false;
+                    }
+                }
+                ois.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.err.println("Dictionary not found! Using empty dictionary...");
+            }
+        }
+
+        Word.setAccuracyNumber(accuracy); //2-3 for songs, more for texts
+        dictionary.regenerateLastWords();
+        
         if (threads > 1) {
             int count = sources.size() % threads;
             for (int i = 0; i < count + 1; i++) {
@@ -164,18 +213,34 @@ public class Boot {
             }
         }
 
-        DerpyWriter.setIgnorePunctuation(ignorePunctuation); //This will allow end punctuation to be placed close together. If this is not wanted, this value should be false...
-        DerpyWriter dw = new DerpyWriter(dictionary);
-        String outString = dw.generateStory(output).replaceAll(" \\.", ".").replaceAll(" \\,", ",").replaceAll(" !", "!");
-        if (outputFile == null) {
-            System.out.println(dw);
-        } else {
+        if (write) {
+            DerpyWriter.setIgnorePunctuation(ignorePunctuation); //This will allow end punctuation to be placed close together. If this is not wanted, this value should be false...
+            DerpyWriter dw = new DerpyWriter(dictionary);
+            String outString = dw.generateStory(output).replaceAll(" \\.", ".").replaceAll(" \\,", ",").replaceAll(" !", "!");
+            if (outputFile == null) {
+                System.out.println(dw);
+            } else {
+                try {
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outputFile)));
+                    writer.write(outString);
+                    writer.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(Boot.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+        if (outputDictionary != null) {
             try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outputFile)));
-                writer.write(outString);
-                writer.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Boot.class.getName()).log(Level.SEVERE, null, ex);
+                ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(outputDictionary))));
+                oos.writeInt(Word.accuracyNumber);
+                for (Word word : dictionary.getWordList()) {
+                    oos.writeObject(word);
+                    oos.flush();
+                }
+                oos.close();
+            } catch (IOException e) {
+                System.err.println("Unable to save file! Ignoring any changes made!");
             }
         }
 

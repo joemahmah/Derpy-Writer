@@ -35,6 +35,7 @@ public class Dictionary implements Serializable {
 
     private volatile List<Word> words;
     private volatile List<Word> lastWords;
+    static final long serialVersionUID = -3010695769693014199L;
 
     public Dictionary() {
         words = new ArrayList<>();
@@ -44,6 +45,18 @@ public class Dictionary implements Serializable {
             lastWords.add(Word.wordNotFound);
         }
 
+    }
+    
+    public void regenerateLastWords(){
+        lastWords = new ArrayList<Word>();
+
+        for (int i = 0; i < Word.accuracyNumber; i++) {
+            lastWords.add(Word.wordNotFound);
+        }
+    }
+    
+    public synchronized void addWord(Word word){
+        words.add(word);
     }
 
     public synchronized int getSize() {
@@ -56,11 +69,11 @@ public class Dictionary implements Serializable {
 
     public synchronized void addWord(String name) {
         for (int i = Word.accuracyNumber - 1; i >= 0; i--) {
-            lastWords.get(i).addWordAfter(getWord(name),i);
+            lastWords.get(i).addWordAfter(getWord(name), i);
         }
-        
-        for(int i = Word.accuracyNumber -1; i > 0; i--){
-            lastWords.set(i,lastWords.get(i-1));
+
+        for (int i = Word.accuracyNumber - 1; i > 0; i--) {
+            lastWords.set(i, lastWords.get(i - 1));
         }
         lastWords.set(0, getWord(name));
     }
@@ -90,6 +103,18 @@ public class Dictionary implements Serializable {
         for (Word word : words) {
             System.out.println(word);
         }
+    }
+    
+    public List<Word> getWordList(){
+        return words;
+    }
+
+    public String toString() {
+        String s = "";
+        for (Word word : words) {
+            s += word + "\n";
+        }
+        return s;
     }
 
 }

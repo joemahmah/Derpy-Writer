@@ -35,12 +35,13 @@ import java.util.Map;
  */
 public class Word implements Serializable {
 
-    public static Word wordNotFound = new Word("/dev/erg",Short.MAX_VALUE);
-    public static int accuracyNumber = 5;
+    public static Word wordNotFound = new Word("/dev/erg",256);
+    public static int accuracyNumber = 10;
+    static final long serialVersionUID = -3010695769693014399L;
     
     private volatile String name;
     private volatile int rarity;
-    private volatile List< Map<Word, Integer> > wordsAfter;
+    private volatile List< Map<String, Integer> > wordsAfter;
     
     public static synchronized void setAccuracyNumber(int accuracyNumber){
         Word.accuracyNumber = accuracyNumber;
@@ -52,7 +53,7 @@ public class Word implements Serializable {
         this.wordsAfter = new ArrayList<>();
         
         for(int i=0; i<accuracyNumber; i++){
-            wordsAfter.add(new HashMap<Word, Integer>());
+            wordsAfter.add(new HashMap<String, Integer>());
         }
         
     }
@@ -63,7 +64,7 @@ public class Word implements Serializable {
         this.wordsAfter = new ArrayList<>();
         
         for(int i=0; i<size; i++){
-            wordsAfter.add(new HashMap<Word, Integer>());
+            wordsAfter.add(new HashMap<String, Integer>());
         }
         
     }
@@ -74,13 +75,13 @@ public class Word implements Serializable {
 
     public synchronized void addWordAfter(Word word, int index) {
         if (wordsAfter.get(index).containsKey(word)) {
-            wordsAfter.get(index).put(word, wordsAfter.get(index).get(word)+1);
+            wordsAfter.get(index).put(word.getName(), wordsAfter.get(index).get(word)+1);
         } else {
-            wordsAfter.get(index).put(word, 1);
+            wordsAfter.get(index).put(word.getName(), 1);
         }
     }
     
-    public synchronized Map<Word, Integer> getWordsAfter(int index){
+    public synchronized Map<String, Integer> getWordsAfter(int index){
         return wordsAfter.get(index);
     }
     
