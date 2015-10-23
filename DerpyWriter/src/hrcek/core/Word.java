@@ -45,9 +45,9 @@ public class Word implements Serializable {
     public static int accuracyNumber = 10;
     static final long serialVersionUID = -3010695769693014399L;
     
-    private volatile String name;
-    private volatile int rarity;
-    private volatile List< Map<String, Integer> > wordsAfter;
+    protected volatile String name;
+    protected volatile int rarity;
+    protected volatile List< Map<String, Integer> > wordsAfter;
     
     /**
      * This method is used to set the global accuracy value. Use this method with

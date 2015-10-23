@@ -39,6 +39,8 @@ public class Dictionary implements Serializable {
     private volatile List<Word> words;
     private volatile List<Word> lastWords;
     static final long serialVersionUID = -3010695769693014199L;
+    
+    int lastPunctuation = 0;
 
     /**
      * This is the default constructor for the dictionary.
@@ -107,6 +109,13 @@ public class Dictionary implements Serializable {
             lastWords.set(i, lastWords.get(i - 1));
         }
         lastWords.set(0, getWord(name));
+        
+        if(Punctuation.isPunctuation(getWord(name))){
+            ((Punctuation)getWord(name)).addLength(lastPunctuation);
+            lastPunctuation = 0;
+        } else{
+            lastPunctuation++;
+        }
     }
 
     /**
@@ -124,6 +133,14 @@ public class Dictionary implements Serializable {
             }
         }
 
+        for(String s: Punctuation.punctuations){
+            if(s.equals(name)){
+                Punctuation newWord = new Punctuation(name);
+                words.add(newWord);
+                return newWord;
+            }
+        }
+        
         Word newWord = new Word(name);
         words.add(newWord);
         return newWord;
