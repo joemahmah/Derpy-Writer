@@ -51,6 +51,7 @@ public class Boot {
     public static ArrayList<String> sources = new ArrayList<String>();
     public static int accuracy = 1;
     public static int accuracy_write = 0;
+    public static int dictionary_accuracy = 0;
     public static int output = 100;
     public static String outputFile = null;
     public static String inputDictionary = null;
@@ -172,7 +173,7 @@ public class Boot {
                 }
 
                 ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(new File(inputDictionary))));
-                accuracy = ois.readInt();
+                dictionary_accuracy = accuracy = ois.readInt();
 
                 if (verbose) {
                     System.out.println("Dictionary accuracy read... " + accuracy);
@@ -263,7 +264,7 @@ public class Boot {
         if (write) {
             if (verbose) {
                 System.out.println("Writing...");
-                if(ignorePunctuation){
+                if (ignorePunctuation) {
                     System.out.println("Ignoring logical punctuation...");
                 }
             }
@@ -308,6 +309,13 @@ public class Boot {
             try {
                 if (verbose) {
                     System.out.println("Dumping dictionary...");
+                }
+                if (inputDictionary != null) {
+                    if (verbose) {
+                        System.out.println("Returning accuracy to dictionary accuracy...");
+                    }
+                    Word.setAccuracyNumber(dictionary_accuracy);
+                    dictionary.regenerateLastWords();
                 }
                 ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(outputDictionary))));
                 oos.writeInt(Word.accuracyNumber);
