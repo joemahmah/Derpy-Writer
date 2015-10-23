@@ -28,7 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * This class holds words and acts as a buffer between the reader and writer. It
+ * stores a list of words that can be used for writing as well as a list of words
+ * last used in writing.
+ * 
  * @author Michael Hrcek <hrcekmj@clarkson.edu>
  */
 public class Dictionary implements Serializable {
@@ -37,6 +40,9 @@ public class Dictionary implements Serializable {
     private volatile List<Word> lastWords;
     static final long serialVersionUID = -3010695769693014199L;
 
+    /**
+     * This is the default constructor for the dictionary.
+     */
     public Dictionary() {
         words = new ArrayList<>();
         lastWords = new ArrayList<Word>();
@@ -47,6 +53,10 @@ public class Dictionary implements Serializable {
 
     }
     
+    /**
+     * This method is needed if the word accuracy has changed. This allows the
+     * reader and writer to function properly.
+     */
     public void regenerateLastWords(){
         lastWords = new ArrayList<Word>();
 
@@ -55,18 +65,39 @@ public class Dictionary implements Serializable {
         }
     }
     
+    /**
+     * This method adds a word to the dictionary.
+     * 
+     * @param word Word to be added.
+     */
     public synchronized void addWord(Word word){
         words.add(word);
     }
 
+    /**
+     * Gets the number of words in the dictionary.
+     * 
+     * @return Words in the dictionary.
+     */
     public synchronized int getSize() {
         return words.size();
     }
 
+    /**
+     * Gets the word at index.
+     * 
+     * @param index The index of the word.
+     * @return The word at the index.
+     */
     public synchronized Word getWord(int index) {
         return words.get(index);
     }
 
+    /**
+     * Adds a word based on a string representation.
+     * 
+     * @param name 
+     */
     public synchronized void addWord(String name) {
         for (int i = Word.accuracyNumber - 1; i >= 0; i--) {
             lastWords.get(i).addWordAfter(getWord(name), i);
@@ -78,6 +109,14 @@ public class Dictionary implements Serializable {
         lastWords.set(0, getWord(name));
     }
 
+    /**
+     * Gets the word based on a string representation of the word. It the word 
+     * does not exist, it is created and added to the dictionary using the string
+     * representation given.
+     * 
+     * @param name The string representation of the word.
+     * @return Word corresponding to the string representation.
+     */
     public synchronized Word getWord(String name) {
         for (Word word : words) {
             if (word.getName().equals(name)) {
@@ -90,6 +129,12 @@ public class Dictionary implements Serializable {
         return newWord;
     }
 
+    /**
+     * Determines if a word exists in the dictionary.
+     * 
+     * @param name String representation of the word.
+     * @return If the word exists.
+     */
     public synchronized boolean hasWord(String name) {
         for (Word word : words) {
             if (word.getName().equals(name)) {
@@ -99,16 +144,30 @@ public class Dictionary implements Serializable {
         return false;
     }
 
+    /**
+     * This method prints the contents of the dictionary. Prints to standard output.
+     */
     public synchronized void printContents() {
         for (Word word : words) {
             System.out.println(word);
         }
     }
     
+    /**
+     * Gets the list of words in the dictionary.
+     * 
+     * @return The list of words in the dictionary.
+     */
     public List<Word> getWordList(){
         return words;
     }
 
+    /**
+     * A typical toString() method... Creates a string containing all of the string
+     * representations of the words in the dictionary. They are separated by new lines.
+     * 
+     * @return The dictionary as a string.
+     */
     public String toString() {
         String s = "";
         for (Word word : words) {
