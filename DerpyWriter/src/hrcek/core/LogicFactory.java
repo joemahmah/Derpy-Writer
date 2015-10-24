@@ -28,25 +28,55 @@ import java.util.List;
 import java.util.Random;
 
 /**
- *
+ * This class holds a number of functions used by the derpy reader and writer. It
+ * has generic functions for things like random integers. It also holds logic to
+ * get random words based on a dictionary object or a word object.
+ * 
  * @author Michael Hrcek <hrcekmj@clarkson.edu>
  */
 public class LogicFactory {
 
     private static volatile Random random = new Random();
 
+    /**
+     * This function gets a random positive integer.
+     * 
+     * @return A random integer.
+     */
     public static synchronized int getRandomInt() {
         return random.nextInt();
     }
 
+    /**
+     * This function gets a random integer between 0 and a user defined end.
+     * 
+     * @param max Maximum number the function may return.
+     * @return A number between 0 and a user defined max.
+     */
     public static synchronized int getRandomInt(int max) {
         return random.nextInt(max);
     }
 
+    /**
+     * This function gets a random integer between a user defined minimum and a
+     * user defined maximum.
+     * 
+     * @param min User defined minimum value.
+     * @param max User defined maximum value.
+     * @return A random number between min and max.
+     */
     public static synchronized int getRandomInt(int min, int max) {
         return min + getRandomInt(max);
     }
 
+    /**
+     * This function returns a random weighted boolean. This function uses a
+     * fractional weighting with the average chance being about equal to num/denom.
+     * 
+     * @param num The numerator for the fractional weighting.
+     * @param denom The denominator for the fractional weighting.
+     * @return A fractionally weighted boolean.
+     */
     public static synchronized boolean getBoolean(int num, int denom) {
         int i = getRandomInt(denom);
         if (i < num) {
@@ -56,6 +86,14 @@ public class LogicFactory {
         return false;
     }
 
+    /**
+     * This function picks a random word based upon previously used words. It weighs
+     * words based on their likelyhood to appear after x words.
+     * 
+     * @param currentWord Array of past words. The size of the array is based on accuracy.
+     * @param dictionary The dictionary pulling from.
+     * @return 
+     */
     public synchronized static Word getRandomWord(Word[] currentWord, Dictionary dictionary) {
         List<Word> wordList = new ArrayList();
 
@@ -92,14 +130,28 @@ public class LogicFactory {
 
     }
 
+    /**
+     * This function randomly gets a word form the dictionary.
+     * 
+     * @param dictionary Dictionary to be used.
+     * @return A random word.
+     */
     public synchronized static Word getRandomWord(Dictionary dictionary) {
         return dictionary.getWord(getRandomInt(dictionary.getSize()));
     }
 
+    /**
+     * Determines if a word is a sentence end.
+     * 
+     * @param word Word to be checked.
+     * @return If word is a sentence end.
+     */
     public synchronized static boolean isSentenceEnd(Word word) {
 
-        if (word.getName().equals(".") || word.getName().equals("!") || word.getName().equals("?") || word.getName().equals("...")) {
-            return true;
+        for(String punct: Punctuation.punctuations){
+            if(word.getName().equals(punct)){
+                return true;
+            }
         }
 
         return false;
