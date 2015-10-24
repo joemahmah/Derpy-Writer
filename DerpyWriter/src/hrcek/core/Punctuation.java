@@ -27,14 +27,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * This class is an extension of Word that is used for determining punctuation
+ * logic. 
+ * 
  * @author Michael Hrcek <hrcekmj@clarkson.edu>
  */
 public class Punctuation extends Word{
 
-    private List<Integer> sentenceLengths;
+    private List<Integer> sentenceLengths; //This might need a new data type to work with large texts. (list of [avg of 10000] + current list) / total
     private int averageSentenceLength;
     
+    /**
+     * This function is used to determine if a word is actually a punctuation.
+     * 
+     * @param word Word to be checked
+     * @return If the word is a punctuation
+     */
     public static boolean isPunctuation(Word word){
         if(word instanceof Punctuation){
             return true;
@@ -44,12 +52,24 @@ public class Punctuation extends Word{
     
     public static final String[] punctuations = {",",".","!","?"};
     
+    /**
+     * A constructor. Does everything the Word constructor does in addition to
+     * defining average sentence lengths for each punctuation type.
+     * 
+     * @param name String literal of the punctuation type.
+     */
     public Punctuation(String name) {
         super(name);
         averageSentenceLength = 0;
         sentenceLengths = new ArrayList<>();
     }
     
+    /**
+     * This method calculates and gets the average sentence length for this
+     * punctuation.
+     * 
+     * @return Average sentence length for this punctuation.
+     */
     public int getAverageSentenceLength(){
         
         averageSentenceLength = 0;
@@ -63,6 +83,12 @@ public class Punctuation extends Word{
         return averageSentenceLength;
     }
     
+    /**
+     * Adds a sentence length to the punctuation. This allows the punctuation to
+     * determine an average.
+     * 
+     * @param length Length of sentence to be added.
+     */
     public void addLength(int length){
         sentenceLengths.add(length);
     }
