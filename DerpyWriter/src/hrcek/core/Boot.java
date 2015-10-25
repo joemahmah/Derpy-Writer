@@ -240,13 +240,16 @@ public class Boot {
             }
             if (threads > 1) {
                 if (verbose) {
-                    System.out.println("Distributing work over " + threads + "threads...");
+                    System.out.println("Distributing work over " + threads + " threads...");
                 }
-                int count = sources.size() % threads;
-                for (int i = 0; i < count + 1; i++) {
+                int count = sources.size() / threads;
+                if(sources.size() % threads != 0){
+                    count++;
+                }
+                for (int i = 0; i < count; i++) {
                     Thread t[] = new Thread[threads];
                     for (int o = 0; o < threads; o++) {
-                        if ((i * threads) + o > sources.size()) {
+                        if ((i * threads) + o >= sources.size()) {
                             break;
                         }
                         DerpyReader derpyReader = new DerpyReader(dictionary);
@@ -255,14 +258,14 @@ public class Boot {
                         t[o].run();
                     }
                     for (int o = 0; o < threads; o++) {
-                        if ((i * threads) + o > sources.size()) {
+                        if ((i * threads) + o >= sources.size()) {
                             break;
                         }
                         t[o].join();
                     }
-                    if (verbose) {
-                        System.out.println("Sources read...");
-                    }
+                }
+                if (verbose) {
+                    System.out.println("Sources read...");
                 }
             } else {
                 for (int i = 0; i < sources.size(); i++) {
