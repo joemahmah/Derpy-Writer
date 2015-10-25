@@ -146,6 +146,29 @@ public class Boot {
                 ignorePunctuation = true;
             } else if (args[i].equals("-r")) {
                 write = false;
+            } else if (args[i].equals("-w")) {
+                try {
+                    output = Integer.parseInt(args[++i]);
+                    if (output <= 0) {
+                        System.out.println("Argument must be a positive integer");
+                        System.exit(0);
+                    } else {
+                        i++;
+                        for (; output > 0; output--) {
+                            if (isFilenameValid(args[i])) {
+                                if (new File(args[i]).exists()) {
+                                    sources.add(new File(args[i]).getAbsolutePath());
+                                }
+                            } else {
+                                System.out.println("Invalid filename: " + args[i]);
+                                System.exit(0);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("Argument must be a positive integer");
+                    System.exit(0);
+                }
             } else {
                 // Assume a relative path if not absolute
                 if (isFilenameValid(args[i])) {
