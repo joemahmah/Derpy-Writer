@@ -76,6 +76,7 @@ public class Boot {
         System.out.println("\t-s [FILE]         save dictionary file.");
         System.out.println("\t-r                only read files.");
         System.out.println("\t-v                verbose mode");
+        System.out.println("\t-w [#] [FILE]     read the file a number of times");
     }
 
     public static boolean isFilenameValid(String file) {
