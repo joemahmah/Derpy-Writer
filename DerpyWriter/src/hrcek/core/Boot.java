@@ -60,6 +60,7 @@ public class Boot {
     public static boolean ignorePunctuation = false;
     public static boolean write = true;
     public static boolean VERBOSE = false;
+    public static boolean formatText = true;
 
     private static Dictionary dictionary;
 
@@ -79,6 +80,7 @@ public class Boot {
         System.out.println("\t-r                only read files.");
         System.out.println("\t-v                verbose mode");
         System.out.println("\t-w [#] [FILE]     read the file a number of times");
+        System.out.println("\t-nf               do not format text");
     }
 
     public static boolean isFilenameValid(String file) {
@@ -163,7 +165,11 @@ public class Boot {
 
         DerpyWriter.setIgnorePunctuation(ignorePunctuation); //This will allow end punctuation to be placed close together. If this is not wanted, this value should be false...
         DerpyWriter dw = new DerpyWriter(dictionary);
-        String outString = dw.generateStory(output).replaceAll(" \\.", ".").replaceAll(" \\,", ",").replaceAll(" !", "!") + "\n";
+        String outString = dw.generateStory(output);
+        
+        if(formatText){
+            outString = formatOutput(outString);
+        }
 
         printIfVerbose("Story created...");
         printIfVerbose("Determining write location...");
@@ -184,6 +190,23 @@ public class Boot {
                 Logger.getLogger(Boot.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+    
+    /**
+     * This method formats punctuation for raw Derpy Writer output.
+     * 
+     * @param input Output from Derpy Writer
+     * @return More standard English punctuation.
+     */
+    public static String formatOutput(String input){
+        String output = input.replaceAll(" \\.", ".");
+        output = output.replaceAll(" \\,", ",");
+        output = output.replaceAll(" !", "!");
+        output = output.replaceAll(" ;", ";");
+        output = output.replaceAll(" :", ":");
+        output += "\n";
+        
+        return output;
     }
 
     public static void readSources() throws InterruptedException {
@@ -319,6 +342,8 @@ public class Boot {
                 }
             } else if (args[i].equals("-v")) {
                 VERBOSE = true;
+            } else if (args[i].equals("-nf")) {
+                formatText = false;
             } else if (args[i].equals("-s")) {
                 if (!args[++i].equals("-")) {
                     outputDictionary = args[i];
