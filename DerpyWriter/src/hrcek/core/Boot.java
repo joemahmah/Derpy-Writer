@@ -66,7 +66,7 @@ public class Boot {
 
     public static void showUsage() {
         System.out.println("Usage:");
-        System.out.println("java DerpyWriter <arguments>\n");
+        System.out.println("java -jar DerpyWriter.jar <arguments>\n");
         System.out.println("\tArguments:");
         System.out.println("\t<source files>    plaintext files used for source");
         System.out.println("\t-a [#]            accuracy (default 1)");
