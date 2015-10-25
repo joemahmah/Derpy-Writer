@@ -48,7 +48,7 @@ public class Boot {
     /**
      * @param args the command line arguments
      */
-    public static ArrayList<String> sources = new ArrayList<String>();
+    public static ArrayList<String> sources = new ArrayList<>();
     public static int accuracy = 1;
     public static int accuracy_write = 0;
     public static int dictionary_accuracy = 0;
@@ -149,13 +149,13 @@ public class Boot {
                 write = false;
             } else if (args[i].equals("-w")) {
                 try {
-                    output = Integer.parseInt(args[++i]);
-                    if (output <= 0) {
+                    int weight = Integer.parseInt(args[++i]);
+                    if (weight <= 0) {
                         System.out.println("Argument must be a positive integer");
                         System.exit(0);
                     } else {
-                        i++;
-                        for (; output > 0; output--) {
+                        ++i;
+                        for (; weight > 0; weight--) {
                             if (isFilenameValid(args[i])) {
                                 if (new File(args[i]).exists()) {
                                     sources.add(new File(args[i]).getAbsolutePath());
@@ -189,7 +189,7 @@ public class Boot {
         }
 
         Dictionary dictionary = new Dictionary();
-
+        
         if (inputDictionary != null) {
             try {
                 if (verbose) {
@@ -287,7 +287,7 @@ public class Boot {
             Word.setAccuracyNumber(accuracy_write);
             dictionary.regenerateLastWords();
         }
-
+        
         if (write) {
             if (verbose) {
                 System.out.println("Writing...");
