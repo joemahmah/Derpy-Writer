@@ -23,6 +23,9 @@
  */
 package hrcek.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Michael Hrcek <hrcekmj@clarkson.edu>
@@ -44,17 +47,18 @@ public class DerpyWriter {
 
     public DerpyWriter(Dictionary dictionary) {
         this.dictionary = dictionary;
-        targetSentencesPerParagraph = 10;
+        targetSentencesPerParagraph = 5;
     }
 
     public void setTargetSentencesPerParagraph(int targetSentencesPerParagraph) {
         this.targetSentencesPerParagraph = targetSentencesPerParagraph;
     }
 
-    String generateStory(int wordCount) {
-        String story = "";
+    List<String> generateStory(int wordCount) {
+        List<String> story = new ArrayList<>();
         int sentenceCount = 0;
         Word[] lastWords = new Word[Word.accuracyNumber];
+        String paragraph = "";
 
         for (int i = 0; i < lastWords.length; i++) {
             lastWords[i] = LogicFactory.getRandomWord(dictionary);
@@ -66,9 +70,9 @@ public class DerpyWriter {
             lastWord = LogicFactory.getRandomWord(lastWords, dictionary);
 
             if (DerpyReader.isEndPunctuation(lastWords[1])) {
-                story += DerpyFormatter.captializeWord(lastWord) + " ";
+                paragraph += DerpyFormatter.captializeWord(lastWord) + " ";
             } else {
-                story += lastWord.getName() + " ";
+                paragraph += lastWord.getName() + " ";
             }
 
             if (DerpyReader.isEndPunctuation(lastWord)) {
@@ -76,10 +80,15 @@ public class DerpyWriter {
             }
 
             if (sentenceCount >= targetSentencesPerParagraph) {
-                story += "\n\n";
                 sentenceCount = 0;
+
+                //Add "paragraph" to story
+                story.add(paragraph.toString());
+                paragraph = "";
             }
         }
+
+        story.add(paragraph); //Adds remaining paragraph
 
         return story;
     }

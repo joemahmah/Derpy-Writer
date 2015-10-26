@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -165,10 +166,10 @@ public class Boot {
 
         DerpyWriter.setIgnorePunctuation(ignorePunctuation); //This will allow end punctuation to be placed close together. If this is not wanted, this value should be false...
         DerpyWriter dw = new DerpyWriter(dictionary);
-        String outString = dw.generateStory(output);
+        List<String> paragraphs = dw.generateStory(output);
         
         if(formatText){
-            outString = formatOutput(outString);
+            paragraphs = DerpyFormatter.formatParagraphs(paragraphs);
         }
 
         printIfVerbose("Story created...");
@@ -183,7 +184,10 @@ public class Boot {
             try {
                 printIfVerbose("Dumping story to file...");
                 BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outputFile)));
-                writer.write(outString);
+                for(String paragraph: paragraphs){
+                    writer.write(paragraph);
+                    writer.write("\n\n");
+                }
                 writer.close();
                 printIfVerbose("Finished dumping story...");
             } catch (IOException ex) {
@@ -192,23 +196,6 @@ public class Boot {
         }
     }
     
-    /**
-     * This method formats punctuation for raw Derpy Writer output.
-     * 
-     * @param input Output from Derpy Writer
-     * @return More standard English punctuation.
-     */
-    public static String formatOutput(String input){
-        String output = input.replaceAll(" \\.", ".");
-        output = output.replaceAll(" \\,", ",");
-        output = output.replaceAll(" !", "!");
-        output = output.replaceAll(" ;", ";");
-        output = output.replaceAll(" :", ":");
-        output += "\n";
-        
-        return output;
-    }
-
     public static void readSources() throws InterruptedException {
         if (sources.size() != 0) {
             printIfVerbose("Sources detected...");

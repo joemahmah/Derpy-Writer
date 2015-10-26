@@ -23,6 +23,9 @@
  */
 package hrcek.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This class contains methods used to format input and output.
  * 
@@ -41,6 +44,69 @@ public class DerpyFormatter {
         String strNew = Character.toUpperCase(strOrig.charAt(0)) + strOrig.substring(1);
                 
         return strNew;
+    }
+    
+    public static List<String> formatParagraphs(List<String> paragraphs){
+        List<String> formattedParagraphs = new ArrayList<>();
+        for(String paragraph: paragraphs){
+            paragraph = unspaceColon(paragraph);
+            paragraph = unspaceSemicolon(paragraph);
+            paragraph = unspacePeriods(paragraph);
+            paragraph = unspaceComma(paragraph);
+            paragraph = unspaceExclaim(paragraph);
+            formattedParagraphs.add(paragraph);
+        }
+        return formattedParagraphs;
+    }
+    
+    public static String unspacePeriods(String in){
+        String out = in.replaceAll(" \\.", ".");
+        return out;
+    }
+    
+    public static String spacePeriods(String in){
+        String out = in.replaceAll("\\.", " . ");
+        return out;
+    }
+    
+    public static String unspaceComma(String in){
+        String out = in.replaceAll(" \\,", ",");
+        return out;
+    }
+    
+    public static String spaceComma(String in){
+        String out = in.replaceAll("\\,", " , ");
+        return out;
+    }
+    
+    public static String unspaceExclaim(String in){
+        String out = in.replaceAll(" !", "!");
+        return out;
+    }
+    
+    public static String spaceExclaim(String in){
+        String out = in.replaceAll("!", " ! ");
+        return out;
+    }
+    
+    public static String unspaceSemicolon(String in){
+        String out = in.replaceAll(" ;", ";");
+        return out;
+    }
+    
+    public static String spaceSemiColon(String in){
+        String out = in.replaceAll(";", " ; ");
+        return out;
+    }
+    
+    public static String unspaceColon(String in){
+        String out = in.replaceAll(" :", ":");
+        return out;
+    }
+    
+    public static String spaceColon(String in){
+        String out = in.replaceAll(":", " : ");
+        return out;
     }
     
 }
