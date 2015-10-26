@@ -110,7 +110,7 @@ public class Dictionary implements Serializable {
         }
         lastWords.set(0, getWord(name));
         
-        if(Punctuation.isPunctuation(getWord(name))){
+        if(DerpyReader.isPunctuation(getWord(name))){
             ((Punctuation)getWord(name)).addLength(lastPunctuation);
             lastPunctuation = 0;
         } else{

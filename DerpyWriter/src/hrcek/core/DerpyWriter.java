@@ -31,22 +31,20 @@ public class DerpyWriter {
 
     private volatile Dictionary dictionary;
     private int targetSentencesPerParagraph;
-    private boolean useRandom;
 
     private static boolean ignorePunctuation = false;
-    
-    public static void setIgnorePunctuation(boolean ignorePunctuation){
+
+    public static void setIgnorePunctuation(boolean ignorePunctuation) {
         DerpyWriter.ignorePunctuation = ignorePunctuation;
     }
-    
-    public static boolean ignoresPunctuation(){
+
+    public static boolean ignoresPunctuation() {
         return ignorePunctuation;
     }
-    
+
     public DerpyWriter(Dictionary dictionary) {
         this.dictionary = dictionary;
-        targetSentencesPerParagraph = 5;
-        useRandom = false;
+        targetSentencesPerParagraph = 10;
     }
 
     public void setTargetSentencesPerParagraph(int targetSentencesPerParagraph) {
@@ -63,34 +61,24 @@ public class DerpyWriter {
         }
 
         for (int i = 0; i < wordCount; i++) {
-            if (!useRandom) {
-                Word lastWord = LogicFactory.getRandomWord(lastWords, dictionary);
+            Word lastWord;
 
-                story += lastWord.getName() + " ";
+            lastWord = LogicFactory.getRandomWord(lastWords, dictionary);
 
-                if (LogicFactory.isSentenceEnd(lastWord)) {
-                    sentenceCount++;
-                }
-
-                if (sentenceCount >= targetSentencesPerParagraph) {
-                    story += "\n\n";
-                    sentenceCount = 0;
-                }
+            if (DerpyReader.isEndPunctuation(lastWords[1])) {
+                story += DerpyFormatter.captializeWord(lastWord) + " ";
             } else {
-                Word lastWord = LogicFactory.getRandomWord(dictionary);
-
                 story += lastWord.getName() + " ";
-
-                if (LogicFactory.isSentenceEnd(lastWord)) {
-                    sentenceCount++;
-                }
-
-                if (sentenceCount >= targetSentencesPerParagraph) {
-                    story += "\n\n";
-                    sentenceCount = 0;
-                }
             }
 
+            if (DerpyReader.isEndPunctuation(lastWord)) {
+                sentenceCount++;
+            }
+
+            if (sentenceCount >= targetSentencesPerParagraph) {
+                story += "\n\n";
+                sentenceCount = 0;
+            }
         }
 
         return story;

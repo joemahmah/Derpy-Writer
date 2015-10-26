@@ -37,20 +37,8 @@ public class Punctuation extends Word{
     private List<Integer> sentenceLengths; //This might need a new data type to work with large texts. (list of [avg of 10000] + current list) / total
     private int averageSentenceLength;
     
-    /**
-     * This function is used to determine if a word is actually a punctuation.
-     * 
-     * @param word Word to be checked
-     * @return If the word is a punctuation
-     */
-    public static boolean isPunctuation(Word word){
-        if(word instanceof Punctuation){
-            return true;
-        }
-        return false;
-    }
-    
-    public static final String[] punctuations = {",",".","!","?"};
+    public static final String[] punctuations = {",",".","!","?",";"};
+    public static final String[] endPunctuations = {".","!","?"};
     
     /**
      * A constructor. Does everything the Word constructor does in addition to

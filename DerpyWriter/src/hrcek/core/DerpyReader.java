@@ -107,6 +107,33 @@ public class DerpyReader implements Runnable {
         }
 
     }
+    
+    /**
+     * This function is used to determine if a word is actually a punctuation.
+     * 
+     * @param word Word to be checked
+     * @return If the word is a punctuation
+     */
+    public static boolean isPunctuation(Word word){
+        if(word instanceof Punctuation){
+            return true;
+        }
+        return false;
+    }
+    
+    public static boolean isEndPunctuation(Word word){
+        if(!isPunctuation(word)){
+            return false;
+        }
+        
+        for(String punct: Punctuation.endPunctuations){
+            if(punct.equals(word.getName())){
+                return true;
+            }
+        }
+        
+        return false;
+    }
 
     private class FileErrorException extends Exception {
 
