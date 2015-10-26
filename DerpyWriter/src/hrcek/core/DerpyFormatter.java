@@ -87,12 +87,12 @@ public class DerpyFormatter {
     }
     
     public static String unspaceQuestion(String in){
-        String out = in.replaceAll(" ?", "?");
+        String out = in.replaceAll(" \\?", "?");
         return out;
     }
     
     public static String spaceQuestion(String in){
-        String out = in.replaceAll("?", " ? ");
+        String out = in.replaceAll("\\?", " ? ");
         return out;
     }
     
@@ -164,7 +164,7 @@ public class DerpyFormatter {
     }
     
     public static String removeQuotes(String in){
-        String out = in.replaceAll("\\", "");
+        String out = in.replaceAll("\"", "");
         return out;
     }
     

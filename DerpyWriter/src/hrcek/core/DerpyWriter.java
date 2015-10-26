@@ -64,15 +64,20 @@ public class DerpyWriter {
             lastWords[i] = LogicFactory.getRandomWord(dictionary);
         }
 
+        boolean isFirstParagraph = true;
         for (int i = 0; i < wordCount; i++) {
             Word lastWord;
 
             lastWord = LogicFactory.getRandomWord(lastWords, dictionary);
 
-            if (DerpyReader.isEndPunctuation(lastWords[1])) {
-                paragraph += DerpyFormatter.captializeWord(lastWord) + " ";
-            } else {
-                paragraph += lastWord.getName() + " ";
+            if (!isFirstParagraph) {
+                if (DerpyReader.isEndPunctuation(lastWords[1])) {
+                    paragraph += DerpyFormatter.captializeWord(lastWord) + " ";
+                } else {
+                    paragraph += lastWord.getName() + " ";
+                }
+            } else{
+                i--;
             }
 
             if (DerpyReader.isEndPunctuation(lastWord)) {
@@ -83,8 +88,13 @@ public class DerpyWriter {
                 sentenceCount = 0;
 
                 //Add "paragraph" to story
-                story.add(paragraph.toString());
-                paragraph = "";
+                if (!isFirstParagraph) {
+                    story.add(paragraph.toString());
+                    paragraph = "";
+                } else {
+                    isFirstParagraph = false;
+                    paragraph = "";
+                }
             }
         }
 
