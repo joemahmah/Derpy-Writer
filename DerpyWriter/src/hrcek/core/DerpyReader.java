@@ -68,7 +68,7 @@ public class DerpyReader implements Runnable {
         while (fileReader.ready()) {
             String line = fileReader.readLine();
             if (line.length() > 0) {
-                line = splitPunctuation(line);
+                line = DerpyFormatter.unformatText(line);
                 String[] words = line.split(" ");
                 for (String word : words) {
                     if (word != "" && word != " ") {
@@ -80,24 +80,6 @@ public class DerpyReader implements Runnable {
 
     }
 
-    private String splitPunctuation(String str) {
-        str = str.replaceAll("\\.", " .");
-        str = str.replaceAll(",", " ,");
-        str = str.replaceAll("\\?", " ?");
-        str = str.replaceAll("!", " !");
-        str = str.replaceAll("\"", "");
-        str = str.replaceAll("\\(", "");
-        str = str.replaceAll("\\)", "");
-        str = str.replaceAll(";", " ;");
-        str = str.replaceAll("\t", " ");
-        str = str.replaceAll("\n", " ");
-        str = str.replaceAll(" - ", " ");
-        str = str.replaceAll("  ", " ");
-        str = str.replaceAll("  ", " ");
-        str = str.replaceAll(":", "");
-        return str;
-    }
-
     @Override
     public void run() {
         try {
@@ -107,31 +89,31 @@ public class DerpyReader implements Runnable {
         }
 
     }
-    
+
     /**
      * This function is used to determine if a word is actually a punctuation.
-     * 
+     *
      * @param word Word to be checked
      * @return If the word is a punctuation
      */
-    public static boolean isPunctuation(Word word){
-        if(word instanceof Punctuation){
+    public static boolean isPunctuation(Word word) {
+        if (word instanceof Punctuation) {
             return true;
         }
         return false;
     }
-    
-    public static boolean isEndPunctuation(Word word){
-        if(!isPunctuation(word)){
+
+    public static boolean isEndPunctuation(Word word) {
+        if (!isPunctuation(word)) {
             return false;
         }
-        
-        for(String punct: Punctuation.endPunctuations){
-            if(punct.equals(word.getName())){
+
+        for (String punct : Punctuation.endPunctuations) {
+            if (punct.equals(word.getName())) {
                 return true;
             }
         }
-        
+
         return false;
     }
 

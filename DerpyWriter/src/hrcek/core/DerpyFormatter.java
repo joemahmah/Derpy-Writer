@@ -46,6 +46,22 @@ public class DerpyFormatter {
         return strNew;
     }
     
+    public static String unformatText(String text){
+        text = spaceColon(text);
+        text = spaceComma(text);
+        text = spaceExclaim(text);
+        text = spacePeriods(text);
+        text = spaceSemiColon(text);
+        text = spaceQuestion(text);
+        text = removeSpaces(text);
+        text = removeNewLines(text);
+        text = removeTabs(text);
+        text = removeParens(text);
+        text = removeQuotes(text);
+        
+        return text;
+    }
+    
     public static List<String> formatParagraphs(List<String> paragraphs){
         List<String> formattedParagraphs = new ArrayList<>();
         for(String paragraph: paragraphs){
@@ -54,6 +70,7 @@ public class DerpyFormatter {
             paragraph = unspacePeriods(paragraph);
             paragraph = unspaceComma(paragraph);
             paragraph = unspaceExclaim(paragraph);
+            paragraph = unspaceQuestion(paragraph);
             formattedParagraphs.add(paragraph);
         }
         return formattedParagraphs;
@@ -66,6 +83,16 @@ public class DerpyFormatter {
     
     public static String spacePeriods(String in){
         String out = in.replaceAll("\\.", " . ");
+        return out;
+    }
+    
+    public static String unspaceQuestion(String in){
+        String out = in.replaceAll(" ?", "?");
+        return out;
+    }
+    
+    public static String spaceQuestion(String in){
+        String out = in.replaceAll("?", " ? ");
         return out;
     }
     
@@ -106,6 +133,38 @@ public class DerpyFormatter {
     
     public static String spaceColon(String in){
         String out = in.replaceAll(":", " : ");
+        return out;
+    }
+    
+    public static String removeSpaces(String in){
+        String out = in.replaceAll("  ", " ");
+        out = in.replaceAll("  ", " ");
+        out = in.replaceAll("  ", " ");
+        out = in.replaceAll("  ", " ");
+        out = in.replaceAll("  ", " ");
+        return out;
+    }
+    
+    public static String removeNewLines(String in){
+        String out = in.replaceAll("\n", " ");
+        out = removeSpaces(out);
+        return out;
+    }
+    
+    public static String removeTabs(String in){
+        String out = in.replaceAll("\t", " ");
+        out = removeSpaces(out);
+        return out;
+    }
+    
+    public static String removeParens(String in){
+        String out = in.replaceAll("\\(", "");
+        out = out.replaceAll("\\)", "");
+        return out;
+    }
+    
+    public static String removeQuotes(String in){
+        String out = in.replaceAll("\\", "");
         return out;
     }
     
