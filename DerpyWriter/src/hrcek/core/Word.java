@@ -68,7 +68,7 @@ public class Word implements Serializable {
      */
     public Word(String name) {
         this.name = name;
-        this.rarity = 1;
+        this.rarity = 0;
         this.wordsAfter = new ArrayList<>();
         
         for(int i=0; i<accuracyNumber; i++){
@@ -98,7 +98,6 @@ public class Word implements Serializable {
     /**
      * This increases the rarity value of the word.
      * 
-     * @deprecated This is currently unused...
      */
     public void increaseRarity() {
         rarity++;
@@ -141,8 +140,6 @@ public class Word implements Serializable {
 
     /**
      * This method gets the rarity of this word.
-     * 
-     * @deprecated Not used...
      * 
      * @return The rarity of the word.
      */

@@ -84,6 +84,14 @@ public class Dictionary implements Serializable {
     public synchronized int getSize() {
         return words.size();
     }
+    
+    public synchronized int getWordCount(){
+        int totalSize = 0;
+        for(Word word: words){
+            totalSize += word.getRarity();
+        }
+        return totalSize;
+    }
 
     /**
      * Gets the word at index.
@@ -109,6 +117,7 @@ public class Dictionary implements Serializable {
             lastWords.set(i, lastWords.get(i - 1));
         }
         lastWords.set(0, getWord(name));
+        lastWords.get(0).increaseRarity();
         
         if(DerpyReader.isPunctuation(getWord(name))){
             ((Punctuation)getWord(name)).addLength(lastPunctuation);
