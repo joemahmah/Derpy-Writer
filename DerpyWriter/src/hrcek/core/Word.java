@@ -110,8 +110,8 @@ public class Word implements Serializable {
      * @param index This is how far back the word occurred.
      */
     public synchronized void addWordAfter(Word word, int index) {
-        if (wordsAfter.get(index).containsKey(word)) {
-            wordsAfter.get(index).put(word.getName(), wordsAfter.get(index).get(word)+1);
+        if (wordsAfter.get(index).containsKey(word.getName())) {
+            wordsAfter.get(index).put(word.getName(), wordsAfter.get(index).get(word.getName())+1);
         } else {
             wordsAfter.get(index).put(word.getName(), 1);
         }
