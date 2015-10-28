@@ -71,7 +71,7 @@ public class DerpyReader implements Runnable {
                 line = DerpyFormatter.unformatText(line);
                 String[] words = line.split(" ");
                 for (String word : words) {
-                    if (word != "" && word != " ") {
+                    if (!word.equals("") && !word.equals(" ")) {
                         dictionary.addWord(word.toLowerCase());
                     }
                 }
