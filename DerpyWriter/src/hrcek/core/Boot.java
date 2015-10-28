@@ -50,6 +50,7 @@ public class Boot {
      * @param args the command line arguments
      */
     public static ArrayList<String> sources = new ArrayList<>();
+    public static ArrayList<Integer> weights = new ArrayList<>();
     public static int accuracy = 1;
     public static int accuracy_write = 0;
     public static int dictionary_accuracy = 0;
@@ -62,7 +63,8 @@ public class Boot {
     public static boolean write = true;
     public static boolean VERBOSE = false;
     public static boolean formatText = true;
-
+    public static boolean threadable = true;
+    
     private static Dictionary dictionary;
 
     public static void showUsage() {
@@ -178,7 +180,10 @@ public class Boot {
         if (outputFile == null) {
             printIfVerbose("Write location not found...");
             printIfVerbose("Dumping to console!\n");
-            System.out.println(dw);
+            for(String paragraph: paragraphs){
+                    System.out.println(paragraph);
+                    System.out.println("\n");
+                }
             printIfVerbose("\n");
         } else {
             try {
@@ -186,7 +191,7 @@ public class Boot {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outputFile)));
                 for(String paragraph: paragraphs){
                     writer.write(paragraph);
-                    writer.write("\n\n");
+                    writer.write("\n");
                 }
                 writer.close();
                 printIfVerbose("Finished dumping story...");
@@ -199,7 +204,7 @@ public class Boot {
     public static void readSources() throws InterruptedException {
         if (sources.size() != 0) {
             printIfVerbose("Sources detected...");
-            if (threads > 1) {
+            if (threads > 1 && threadable) {
 
                 printIfVerbose("Distributing work over " + threads + " threads...");
 
@@ -214,8 +219,7 @@ public class Boot {
                         if ((i * threads) + o >= sources.size()) {
                             break;
                         }
-                        DerpyReader derpyReader = new DerpyReader(dictionary);
-                        derpyReader.setFileLocation(sources.get((i * threads) + o));
+                        DerpyReader derpyReader = new DerpyReader(dictionary,sources.get((i * threads) + o));
                         t[o] = new Thread(derpyReader);
                         t[o].run();
                     }
@@ -228,10 +232,30 @@ public class Boot {
                 }
 
                 printIfVerbose("Sources read...");
+            } else if (!threadable)
+            {
+                int largestWords = -1;
+                int largestWeight = -1;
+                for(int i = 0; i<sources.size(); i++)
+                {
+                    Dictionary tmp = new Dictionary();
+                    new DerpyReader(tmp, sources.get(i)).run();
+                    int tmpMax = tmp.getWordCount();
+                    if(tmpMax > largestWords)
+                    {
+                         largestWords = tmpMax;
+                         largestWeight = weights.get(i);
+                    }
+                }
+                for (int i = 0; i < sources.size(); i++) {
+                    int myWords = ((largestWords*weights.get(i))/largestWeight);
+                    DerpyReader derpyReader = new DerpyReader(dictionary, sources.get(i), myWords);
+                    derpyReader.run();
+                }
+                printIfVerbose("Sources read...");
             } else {
                 for (int i = 0; i < sources.size(); i++) {
-                    DerpyReader derpyReader = new DerpyReader(dictionary);
-                    derpyReader.setFileLocation(sources.get(i));
+                    DerpyReader derpyReader = new DerpyReader(dictionary, sources.get(i));
                     derpyReader.run();
                 }
 
@@ -358,16 +382,16 @@ public class Boot {
                         System.exit(0);
                     } else {
                         ++i;
-                        for (; weight > 0; weight--) {
-                            if (isFilenameValid(args[i])) {
+                        threadable = false;
+                        if (isFilenameValid(args[i])) {
                                 if (new File(args[i]).exists()) {
                                     sources.add(new File(args[i]).getAbsolutePath());
+                                    weights.add(weight);
                                 }
                             } else {
                                 System.out.println("Invalid filename: " + args[i]);
                                 System.exit(0);
                             }
-                        }
                     }
                 } catch (Exception e) {
                     System.out.println("Argument must be a positive integer");
@@ -378,6 +402,7 @@ public class Boot {
                 if (isFilenameValid(args[i])) {
                     if (new File(args[i]).exists()) {
                         sources.add(new File(args[i]).getAbsolutePath());
+                        weights.add(1);
                     }
                 } else {
                     System.out.println("Invalid filename: " + args[i]);

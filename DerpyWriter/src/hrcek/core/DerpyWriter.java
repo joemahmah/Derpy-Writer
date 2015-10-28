@@ -71,7 +71,7 @@ public class DerpyWriter {
             lastWord = LogicFactory.getRandomWord(lastWords, dictionary);
 
             if (!isFirstParagraph) {
-                if (DerpyReader.isEndPunctuation(lastWords[1])) {
+                if (lastWords.length > 1 && DerpyReader.isEndPunctuation(lastWords[1])) {
                     paragraph += DerpyFormatter.captializeWord(lastWord) + " ";
                 } else {
                     paragraph += lastWord.getName() + " ";
