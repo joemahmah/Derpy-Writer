@@ -91,6 +91,10 @@ public class DerpyWriter {
                 if (!isFirstParagraph) {
                     story.add(paragraph.toString());
                     paragraph = "";
+                    
+                    if(Boot.VERBOSE){
+                        System.out.println("Wrote Paragraph " + story.size() + "...");
+                    }
                 } else {
                     isFirstParagraph = false;
                     paragraph = "";
