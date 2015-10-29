@@ -50,10 +50,20 @@ public class DerpyWriter {
         targetSentencesPerParagraph = 5;
     }
 
+    /**
+     * Set the amount of sentences in a paragraph
+     * @param targetSentencesPerParagraph 
+     */
     public void setTargetSentencesPerParagraph(int targetSentencesPerParagraph) {
         this.targetSentencesPerParagraph = targetSentencesPerParagraph;
     }
 
+    /**
+     * Method that generates a defined length of words
+     * 
+     * @param wordCount the number of words you want to be in a story
+     * @return A list of strings that contain the generated story
+     */
     List<String> generateStory(int wordCount) {
         List<String> story = new ArrayList<>();
         int sentenceCount = 0;

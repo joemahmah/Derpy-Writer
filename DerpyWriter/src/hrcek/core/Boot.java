@@ -46,9 +46,6 @@ import java.util.logging.Logger;
  */
 public class Boot {
 
-    /**
-     * @param args the command line arguments
-     */
     public static ArrayList<String> sources = new ArrayList<>();
     public static ArrayList<Integer> weights = new ArrayList<>();
     public static int accuracy = 1;
@@ -86,6 +83,11 @@ public class Boot {
         System.out.println("\t-nf               do not format text");
     }
 
+    /**
+     * 
+     * @param file the filename.
+     * @return true if the file can be opened.
+     */
     public static boolean isFilenameValid(String file) {
         File f = new File(file);
         try {
@@ -201,6 +203,11 @@ public class Boot {
         }
     }
     
+    /**
+     * Read in any text file the DerpyWriter will use.
+     * 
+     * @throws InterruptedException 
+     */
     public static void readSources() throws InterruptedException {
         if (sources.size() != 0) {
             printIfVerbose("Sources detected...");
@@ -264,6 +271,9 @@ public class Boot {
         }
     }
 
+    /**
+     * Saves a local dictionary into file.
+     */
     public static void saveDictionary() {
         try {
             printIfVerbose("Dumpting dictionary...");
@@ -285,6 +295,9 @@ public class Boot {
         }
     }
 
+    /**
+     * Method to load a file of words into a local dictionary
+     */
     public static void loadDictionary() {
         try {
             printIfVerbose("Loading dictionary...");
@@ -315,6 +328,11 @@ public class Boot {
         }
     }
 
+    /**
+     * Method for checking command line flags
+     * 
+     * @param args The arguments
+     */
     public static void checkFlags(String[] args) {
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-a")) {

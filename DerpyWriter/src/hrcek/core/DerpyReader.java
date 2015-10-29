@@ -39,6 +39,7 @@ public class DerpyReader implements Runnable {
     final Dictionary dictionary;
     final String fileLocation;
     final int numWords;
+    
     public DerpyReader(Dictionary dictionary, String fileLocation) {
         this.dictionary = dictionary;
         this.fileLocation = fileLocation;
