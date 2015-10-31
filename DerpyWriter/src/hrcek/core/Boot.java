@@ -276,7 +276,7 @@ public class Boot {
      */
     public static void saveDictionary() {
         try {
-            printIfVerbose("Dumpting dictionary...");
+            printIfVerbose("Dumping dictionary...");
             if (inputDictionary != null) {
                 printIfVerbose("Returning accuracy to dictionary accuracy...");
                 Word.setAccuracyNumber(dictionary_accuracy);
