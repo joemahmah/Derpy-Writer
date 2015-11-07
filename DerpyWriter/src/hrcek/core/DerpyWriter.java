@@ -86,8 +86,12 @@ public class DerpyWriter {
                 } else {
                     paragraph += lastWord.getName() + " ";
                 }
+                
+                if(DerpyReader.isPunctuation(lastWord)){
+                    i--; //Punctuation no longer counts as a word in the wordcount.
+                }
             } else{
-                i--;
+                i--; //Decrements so that the first paragraph does not add to word count.
             }
 
             if (DerpyReader.isEndPunctuation(lastWord)) {

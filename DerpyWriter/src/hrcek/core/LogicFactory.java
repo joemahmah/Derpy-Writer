@@ -89,7 +89,7 @@ public class LogicFactory {
 
     /**
      * This function picks a random word based upon previously used words. It
-     * weighs words based on their likelyhood to appear after x words.
+     * weighs words based on their likelihood to appear after x words.
      *
      * @param pastWords Array of past words. The size of the array is based on
      * accuracy.
