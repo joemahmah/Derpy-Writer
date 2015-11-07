@@ -61,6 +61,7 @@ public class Boot {
     public static boolean VERBOSE = false;
     public static boolean formatText = true;
     public static boolean threadable = true;
+    public static int fileOutputFormat = DerpyFormatter.DERPY_FORMAT_PLAINTEXT;
     
     private static Dictionary dictionary;
 
@@ -81,6 +82,7 @@ public class Boot {
         System.out.println("\t-v                verbose mode");
         System.out.println("\t-w [#] [FILE]     read the file a number of times");
         System.out.println("\t-nf               do not format text");
+        System.out.println("\t-f <txt,html>     Output text as html");
     }
 
     /**
@@ -173,7 +175,7 @@ public class Boot {
         List<String> paragraphs = dw.generateStory(output);
         
         if(formatText){
-            paragraphs = DerpyFormatter.formatParagraphs(paragraphs);
+            paragraphs = DerpyFormatter.formatParagraphs(paragraphs,fileOutputFormat);
         }
 
         printIfVerbose("Story created...");
@@ -415,7 +417,16 @@ public class Boot {
                     System.out.println("Argument must be a positive integer");
                     System.exit(0);
                 }
-            } else {
+            } else if(args[i].equals("-f")){
+                i++;
+                
+                if(args[i].toLowerCase().equals("plaintext") || args[i].toLowerCase().equals("text") || args[i].toLowerCase().equals("txt")){
+                    fileOutputFormat = DerpyFormatter.DERPY_FORMAT_PLAINTEXT;
+                } else if(args[i].toLowerCase().equals("html") || args[i].toLowerCase().equals("htm")){
+                    fileOutputFormat = DerpyFormatter.DERPY_FORMAT_HTML;
+                }
+                
+            }else {
                 // Assume a relative path if not absolute
                 if (isFilenameValid(args[i])) {
                     if (new File(args[i]).exists()) {

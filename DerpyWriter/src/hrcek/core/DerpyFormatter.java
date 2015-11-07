@@ -33,6 +33,9 @@ import java.util.List;
  */
 public class DerpyFormatter {
     
+    public static final int DERPY_FORMAT_PLAINTEXT = 0;
+    public static final int DERPY_FORMAT_HTML = 1;
+    
     /**
      * This method capitalizes words.
      * 
@@ -47,6 +50,7 @@ public class DerpyFormatter {
     }
     
     public static String unformatText(String text){
+        text = standardizeQuotes(text);
         text = spaceColon(text);
         text = spaceComma(text);
         text = spaceExclaim(text);
@@ -62,6 +66,13 @@ public class DerpyFormatter {
         return text;
     }
     
+    /**
+     * This method formats paragraphs as plaintext.
+     * 
+     * @see List<String> formatParagraphs(List<String>, int) for other formats.
+     * @param paragraphs
+     * @return 
+     */
     public static List<String> formatParagraphs(List<String> paragraphs){
         List<String> formattedParagraphs = new ArrayList<>();
         for(String paragraph: paragraphs){
@@ -74,6 +85,54 @@ public class DerpyFormatter {
             formattedParagraphs.add(paragraph);
         }
         return formattedParagraphs;
+    }
+    
+    public static List<String> formatParagraphs(List<String> paragraphs, int format){
+        List<String> formattedParagraphs = new ArrayList<>();
+        for(String paragraph: paragraphs){
+            paragraph = unspaceColon(paragraph);
+            paragraph = unspaceSemicolon(paragraph);
+            paragraph = unspacePeriods(paragraph);
+            paragraph = unspaceComma(paragraph);
+            paragraph = unspaceExclaim(paragraph);
+            paragraph = unspaceQuestion(paragraph);
+            formattedParagraphs.add(paragraph);
+        }
+        
+        if(format == DERPY_FORMAT_PLAINTEXT){
+            return formattedParagraphs;
+        } else if (format == DERPY_FORMAT_HTML){
+            List<String> temp = new ArrayList<>();
+            
+            temp.add(0, "<html><head><title>Derpy Output</title></head><body>");
+            for(String paragraph: formattedParagraphs){
+                String tmpstr = replaceHtmlSpecialCharacters(paragraph);
+                temp.add("<p>" + tmpstr + "</p>");
+            }
+            temp.add("</body></html>");
+            
+            return temp;
+        }
+        
+        return formattedParagraphs;
+    }
+    
+    public static String replaceHtmlSpecialCharacters(String in){
+        String out = in.replaceAll("'", "&#39;");
+        out = out.replaceAll("’", "&#8217;");
+        out = out.replaceAll("‘", "&#8216;");
+        out = out.replaceAll("“", "&#8220;");
+        out = out.replaceAll("”", "&#8221;");
+        out = out.replaceAll("\"", "&#34;");
+        return out;
+    }
+    
+    public static String standardizeQuotes(String in){
+        String out = in.replaceAll("’", "'");
+        out = out.replaceAll("‘", "'");
+        out = out.replaceAll("“", "\"");
+        out = out.replaceAll("”", "\"");
+        return out;
     }
     
     public static String unspacePeriods(String in){
