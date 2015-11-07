@@ -80,7 +80,7 @@ public class Boot {
         System.out.println("\t-s [FILE]         save dictionary file.");
         System.out.println("\t-r                only read files.");
         System.out.println("\t-v                verbose mode");
-        System.out.println("\t-w [#] [FILE]     read the file a number of times");
+        System.out.println("\t-w [#] [FILE]     weight a file relative to the other files");
         System.out.println("\t-nf               do not format text");
         System.out.println("\t-f <txt,html>     Output text as html");
     }
