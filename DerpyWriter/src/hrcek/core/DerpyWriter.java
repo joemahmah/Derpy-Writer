@@ -52,7 +52,8 @@ public class DerpyWriter {
 
     /**
      * Set the amount of sentences in a paragraph
-     * @param targetSentencesPerParagraph 
+     *
+     * @param targetSentencesPerParagraph
      */
     public void setTargetSentencesPerParagraph(int targetSentencesPerParagraph) {
         this.targetSentencesPerParagraph = targetSentencesPerParagraph;
@@ -60,7 +61,7 @@ public class DerpyWriter {
 
     /**
      * Method that generates a defined length of words
-     * 
+     *
      * @param wordCount the number of words you want to be in a story
      * @return A list of strings that contain the generated story
      */
@@ -80,17 +81,17 @@ public class DerpyWriter {
 
             lastWord = LogicFactory.getRandomWord(lastWords, dictionary);
 
-            if (!isFirstParagraph) {
+            if (!isFirstParagraph || ignoreFirstParagraph()) {
                 if (lastWords.length > 1 && DerpyReader.isEndPunctuation(lastWords[1])) {
                     paragraph += DerpyFormatter.captializeWord(lastWord) + " ";
                 } else {
                     paragraph += lastWord.getName() + " ";
                 }
-                
-                if(DerpyReader.isPunctuation(lastWord)){
+
+                if (DerpyReader.isPunctuation(lastWord)) {
                     i--; //Punctuation no longer counts as a word in the wordcount.
                 }
-            } else{
+            } else {
                 i--; //Decrements so that the first paragraph does not add to word count.
             }
 
@@ -105,8 +106,8 @@ public class DerpyWriter {
                 if (!isFirstParagraph) {
                     story.add(paragraph.toString());
                     paragraph = "";
-                    
-                    if(Boot.VERBOSE){
+
+                    if (Boot.VERBOSE) {
                         System.out.println("Wrote Paragraph " + story.size() + "...");
                     }
                 } else {
@@ -119,6 +120,12 @@ public class DerpyWriter {
         story.add(paragraph); //Adds remaining paragraph
 
         return story;
+    }
+    
+    private boolean ignoreFirstParagraph(){
+        boolean ignore = Boot.fileInputFormat == DerpyFormatter.DERPY_FORMAT_HTML;
+    
+        return ignore;
     }
 
 }

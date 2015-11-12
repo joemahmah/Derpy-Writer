@@ -39,7 +39,7 @@ public class DerpyReader implements Runnable {
     final Dictionary dictionary;
     final String fileLocation;
     final int numWords;
-    
+
     public DerpyReader(Dictionary dictionary, String fileLocation) {
         this.dictionary = dictionary;
         this.fileLocation = fileLocation;
@@ -67,14 +67,13 @@ public class DerpyReader implements Runnable {
         }
 
         //TODO ADD ERROR CHECKING
-        if(numWords < 0)
-        {
+        if (numWords < 0) {
             BufferedReader fileReader = new BufferedReader(new FileReader(fileLocation));
 
             while (fileReader.ready()) {
                 String line = fileReader.readLine();
                 if (line.length() > 0) {
-                    line = DerpyFormatter.unformatText(line);
+                    line = DerpyFormatter.unformatText(line, Boot.fileInputFormat);
                     String[] words = line.split(" ");
                     for (String word : words) {
                         if (!word.equals("") && !word.equals(" ")) {
@@ -83,31 +82,29 @@ public class DerpyReader implements Runnable {
                     }
                 }
             }
-        }else{
+        } else {
             int initSize = dictionary.getWordCount();
-            while(dictionary.getWordCount() - initSize < numWords)
-            {
+            while (dictionary.getWordCount() - initSize < numWords) {
                 BufferedReader fileReader = new BufferedReader(new FileReader(fileLocation));
-                 while (fileReader.ready()) {
-                String line = fileReader.readLine();
-                if (line.length() > 0) {
-                    line = DerpyFormatter.unformatText(line);
-                    String[] words = line.split(" ");
-                    for (String word : words) {
-                        if (!word.isEmpty()) {
-                            dictionary.addWord(word.toLowerCase());
+                while (fileReader.ready()) {
+                    String line = fileReader.readLine();
+                    if (line.length() > 0) {
+                        line = DerpyFormatter.unformatText(line);
+                        String[] words = line.split(" ");
+                        for (String word : words) {
+                            if (!word.isEmpty()) {
+                                dictionary.addWord(word.toLowerCase());
+                            }
+                            if (dictionary.getWordCount() - initSize >= numWords) {
+                                fileReader.close();
+                                return;
+                            }
                         }
-                        if(dictionary.getWordCount()-initSize>=numWords)
-                        {
-                            fileReader.close();
-                            return;
-                        }
-                    }
                     }
                 }
-        }
+            }
 
-    }
+        }
     }
 
     @Override

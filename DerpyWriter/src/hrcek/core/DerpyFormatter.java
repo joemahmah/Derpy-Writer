@@ -28,28 +28,33 @@ import java.util.List;
 
 /**
  * This class contains methods used to format input and output.
- * 
+ *
  * @author Michael Hrcek <hrcekmj@clarkson.edu>
  */
 public class DerpyFormatter {
-    
+
     public static final int DERPY_FORMAT_PLAINTEXT = 0;
     public static final int DERPY_FORMAT_HTML = 1;
-    
+    public static final int DERPY_FORMAT_C = 2;
+    public static final int DERPY_FORMAT_CPP = 3;
+    public static final int DERPY_FORMAT_JAVA = 4;
+    public static final int DERPY_FORMAT_SOL = 5;
+    public static final int DERPY_FORMAT_TEXT = 6;
+
     /**
      * This method capitalizes words.
-     * 
+     *
      * @param word Word to be capitalized.
      * @return The capitalized form of the word.
      */
-    public static String captializeWord(Word word){
+    public static String captializeWord(Word word) {
         String strOrig = word.getName();
         String strNew = Character.toUpperCase(strOrig.charAt(0)) + strOrig.substring(1);
-                
+
         return strNew;
     }
-    
-    public static String unformatText(String text){
+
+    public static String unformatText(String text) {
         text = standardizeQuotes(text);
         text = spaceColon(text);
         text = spaceComma(text);
@@ -62,20 +67,72 @@ public class DerpyFormatter {
         text = removeTabs(text);
         text = removeParens(text);
         text = removeQuotes(text);
-        
+
         return text;
     }
-    
+
+    public static String unformatText(String text, int format) {
+
+        if (format == DERPY_FORMAT_PLAINTEXT) {
+            text = standardizeQuotes(text);
+            text = spaceColon(text);
+            text = spaceComma(text);
+            text = spaceExclaim(text);
+            text = spacePeriods(text);
+            text = spaceSemiColon(text);
+            text = spaceParens(text);
+            text = spaceQuotes(text);
+            text = removeNewLines(text);
+            text = removeSpaces(text);
+        } else if (format == DERPY_FORMAT_HTML) {
+            text = unformatHtmlSpecialCharacters(text);
+            text = standardizeQuotes(text);
+            text = spaceColon(text);
+            text = spaceComma(text);
+            text = spaceExclaim(text);
+            text = spacePeriods(text);
+            text = spaceSemiColon(text);
+            text = spaceParens(text);
+            text = spaceQuotes(text);
+            text = spaceTags(text);
+            text = removeNewLines(text);
+            text = removeSpaces(text);
+        } else if (format == DERPY_FORMAT_C) {
+
+        } else if (format == DERPY_FORMAT_CPP) {
+
+        } else if (format == DERPY_FORMAT_JAVA) {
+
+        } else if (format == DERPY_FORMAT_SOL) {
+
+        } else if (format == DERPY_FORMAT_TEXT) {
+            text = standardizeQuotes(text);
+            text = spaceColon(text);
+            text = spaceComma(text);
+            text = spaceExclaim(text);
+            text = spacePeriods(text);
+            text = spaceSemiColon(text);
+            text = spaceQuestion(text);
+            text = removeSpaces(text);
+            text = removeNewLines(text);
+            text = removeTabs(text);
+            text = removeParens(text);
+            text = removeQuotes(text);
+        }
+
+        return text;
+    }
+
     /**
      * This method formats paragraphs as plaintext.
-     * 
+     *
      * @see List<String> formatParagraphs(List<String>, int) for other formats.
      * @param paragraphs
-     * @return 
+     * @return
      */
-    public static List<String> formatParagraphs(List<String> paragraphs){
+    public static List<String> formatParagraphs(List<String> paragraphs) {
         List<String> formattedParagraphs = new ArrayList<>();
-        for(String paragraph: paragraphs){
+        for (String paragraph : paragraphs) {
             paragraph = unspaceColon(paragraph);
             paragraph = unspaceSemicolon(paragraph);
             paragraph = unspacePeriods(paragraph);
@@ -86,10 +143,10 @@ public class DerpyFormatter {
         }
         return formattedParagraphs;
     }
-    
-    public static List<String> formatParagraphs(List<String> paragraphs, int format){
+
+    public static List<String> formatParagraphs(List<String> paragraphs, int format) {
         List<String> formattedParagraphs = new ArrayList<>();
-        for(String paragraph: paragraphs){
+        for (String paragraph : paragraphs) {
             paragraph = unspaceColon(paragraph);
             paragraph = unspaceSemicolon(paragraph);
             paragraph = unspacePeriods(paragraph);
@@ -98,26 +155,26 @@ public class DerpyFormatter {
             paragraph = unspaceQuestion(paragraph);
             formattedParagraphs.add(paragraph);
         }
-        
-        if(format == DERPY_FORMAT_PLAINTEXT){
+
+        if (format == DERPY_FORMAT_PLAINTEXT) {
             return formattedParagraphs;
-        } else if (format == DERPY_FORMAT_HTML){
+        } else if (format == DERPY_FORMAT_HTML) {
             List<String> temp = new ArrayList<>();
-            
+
             temp.add(0, "<html><head><title>Derpy Output</title></head><body>");
-            for(String paragraph: formattedParagraphs){
+            for (String paragraph : formattedParagraphs) {
                 String tmpstr = replaceHtmlSpecialCharacters(paragraph);
                 temp.add("<p>" + tmpstr + "</p>");
             }
             temp.add("</body></html>");
-            
+
             return temp;
         }
-        
+
         return formattedParagraphs;
     }
-    
-    public static String replaceHtmlSpecialCharacters(String in){
+
+    public static String replaceHtmlSpecialCharacters(String in) {
         String out = in.replaceAll("'", "&#39;");
         out = out.replaceAll("’", "&#8217;");
         out = out.replaceAll("‘", "&#8216;");
@@ -126,76 +183,86 @@ public class DerpyFormatter {
         out = out.replaceAll("\"", "&#34;");
         return out;
     }
-    
-    public static String standardizeQuotes(String in){
+
+    public static String unformatHtmlSpecialCharacters(String in) {
+        String out = in.replaceAll("&#39;", "'");
+        out = out.replaceAll("&#8217;", "’");
+        out = out.replaceAll("&#8216;", "‘");
+        out = out.replaceAll("&#8220;", "“");
+        out = out.replaceAll("&#8221;", "”");
+        out = out.replaceAll("&#34;", "\"");
+        return out;
+    }
+
+    public static String standardizeQuotes(String in) {
         String out = in.replaceAll("’", "'");
         out = out.replaceAll("‘", "'");
         out = out.replaceAll("“", "\"");
         out = out.replaceAll("”", "\"");
         return out;
     }
-    
-    public static String unspacePeriods(String in){
+
+    public static String unspacePeriods(String in) {
         String out = in.replaceAll(" \\.", ".");
         return out;
     }
-    
-    public static String spacePeriods(String in){
+
+    public static String spacePeriods(String in) {
         String out = in.replaceAll("\\.", " . ");
         return out;
     }
-    
-    public static String unspaceQuestion(String in){
+
+    public static String unspaceQuestion(String in) {
         String out = in.replaceAll(" \\?", "?");
         return out;
     }
-    
-    public static String spaceQuestion(String in){
+
+    public static String spaceQuestion(String in) {
         String out = in.replaceAll("\\?", " ? ");
         return out;
     }
-    
-    public static String unspaceComma(String in){
+
+    public static String unspaceComma(String in) {
         String out = in.replaceAll(" \\,", ",");
         return out;
     }
-    
-    public static String spaceComma(String in){
+
+    public static String spaceComma(String in) {
         String out = in.replaceAll("\\,", " , ");
         return out;
     }
-    
-    public static String unspaceExclaim(String in){
+
+    public static String unspaceExclaim(String in) {
         String out = in.replaceAll(" !", "!");
         return out;
     }
-    
-    public static String spaceExclaim(String in){
+
+    public static String spaceExclaim(String in) {
         String out = in.replaceAll("!", " ! ");
         return out;
     }
-    
-    public static String unspaceSemicolon(String in){
+
+    public static String unspaceSemicolon(String in) {
         String out = in.replaceAll(" ;", ";");
         return out;
     }
-    
-    public static String spaceSemiColon(String in){
+
+    public static String spaceSemiColon(String in) {
         String out = in.replaceAll(";", " ; ");
         return out;
     }
-    
-    public static String unspaceColon(String in){
+
+    public static String unspaceColon(String in) {
         String out = in.replaceAll(" :", ":");
         return out;
     }
-    
-    public static String spaceColon(String in){
+
+    public static String spaceColon(String in) {
         String out = in.replaceAll(":", " : ");
         return out;
     }
-    
-    public static String removeSpaces(String in){
+
+    public static String removeSpaces(String in) {
         String out = in.replaceAll("  ", " ");
         out = in.replaceAll("  ", " ");
         out = in.replaceAll("  ", " ");
@@ -203,28 +270,56 @@ public class DerpyFormatter {
         out = in.replaceAll("  ", " ");
         return out;
     }
-    
-    public static String removeNewLines(String in){
+
+    public static String removeNewLines(String in) {
         String out = in.replaceAll("\n", " ");
         out = removeSpaces(out);
         return out;
     }
-    
-    public static String removeTabs(String in){
+
+    public static String removeTabs(String in) {
         String out = in.replaceAll("\t", " ");
         out = removeSpaces(out);
         return out;
     }
-    
-    public static String removeParens(String in){
+
+    public static String removeParens(String in) {
         String out = in.replaceAll("\\(", "");
         out = out.replaceAll("\\)", "");
         return out;
     }
-    
-    public static String removeQuotes(String in){
+
+    public static String spaceParens(String in) {
+        String out = in.replaceAll("\\(", " ( ");
+        out = out.replaceAll("\\)", " ) ");
+        return out;
+    }
+
+    public static String unspaceParens(String in) {
+        String out = in.replaceAll("\\( ", "(");
+        out = out.replaceAll(" \\)", ")");
+        return out;
+    }
+
+    public static String removeQuotes(String in) {
         String out = in.replaceAll("\"", "");
         return out;
     }
-    
+
+    public static String spaceQuotes(String in) {
+        String out = in.replaceAll("\"", " \" ");
+        return out;
+    }
+
+    public static String unspaceQuotes(String in) {
+        String out = in.replaceAll(" \" ", "\"");
+        return out;
+    }
+
+    public static String spaceTags(String in) {
+        String out = in.replaceAll(">", "> ");
+        out = out.replaceAll("<", " <");
+        return out;
+    }
+
 }

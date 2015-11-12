@@ -62,31 +62,33 @@ public class Boot {
     public static boolean formatText = true;
     public static boolean threadable = true;
     public static int fileOutputFormat = DerpyFormatter.DERPY_FORMAT_PLAINTEXT;
-    
+    public static int fileInputFormat = DerpyFormatter.DERPY_FORMAT_TEXT;
+
     private static Dictionary dictionary;
 
     public static void showUsage() {
         System.out.println("Usage:");
         System.out.println("java -jar DerpyWriter.jar <arguments>\n");
         System.out.println("\tArguments:");
-        System.out.println("\t<source files>    plaintext files used for source");
-        System.out.println("\t-a [#]            accuracy (default 1)");
-        System.out.println("\t-c [#]            output count (default 100)");
-        System.out.println("\t-h      --help    display this text");
-        System.out.println("\t-o [FILE]         output file (default stdout, hyphen for stdout)");
-        System.out.println("\t-t [#]            thread count (default 1)");
-        System.out.println("\t-i                ignore logical punctuation checking.");
-        System.out.println("\t-l [FILE]         load dictionary file.");
-        System.out.println("\t-s [FILE]         save dictionary file.");
-        System.out.println("\t-r                only read files.");
-        System.out.println("\t-v                verbose mode");
-        System.out.println("\t-w [#] [FILE]     weight a file relative to the other files");
-        System.out.println("\t-nf               do not format text");
-        System.out.println("\t-f <txt,html>     Output text as html");
+        System.out.println("\t<source files>        plaintext files used for source");
+        System.out.println("\t-a [#]                accuracy (default 1)");
+        System.out.println("\t-c [#]                output count (default 100)");
+        System.out.println("\t-h      --help        display this text");
+        System.out.println("\t-o [FILE]             output file (default stdout, hyphen for stdout)");
+        System.out.println("\t-t [#]                thread count (default 1)");
+        System.out.println("\t-i                    ignore logical punctuation checking.");
+        System.out.println("\t-l [FILE]             load dictionary file.");
+        System.out.println("\t-s [FILE]             save dictionary file.");
+        System.out.println("\t-r                    only read files.");
+        System.out.println("\t-v                    verbose mode");
+        System.out.println("\t-w [#] [FILE]         weight a file relative to the other files");
+        System.out.println("\t-nf                   do not format text");
+        System.out.println("\t-fo <txt,html>        Output text as a format (Default plaintext)");
+        System.out.println("\t-fi <txt,normal,html> Input text as a format (Default normal)");
     }
 
     /**
-     * 
+     *
      * @param file the filename.
      * @return true if the file can be opened.
      */
@@ -173,9 +175,9 @@ public class Boot {
         DerpyWriter.setIgnorePunctuation(ignorePunctuation); //This will allow end punctuation to be placed close together. If this is not wanted, this value should be false...
         DerpyWriter dw = new DerpyWriter(dictionary);
         List<String> paragraphs = dw.generateStory(output);
-        
-        if(formatText){
-            paragraphs = DerpyFormatter.formatParagraphs(paragraphs,fileOutputFormat);
+
+        if (formatText) {
+            paragraphs = DerpyFormatter.formatParagraphs(paragraphs, fileOutputFormat);
         }
 
         printIfVerbose("Story created...");
@@ -184,16 +186,16 @@ public class Boot {
         if (outputFile == null) {
             printIfVerbose("Write location not found...");
             printIfVerbose("Dumping to console!\n");
-            for(String paragraph: paragraphs){
-                    System.out.println(paragraph);
-                    System.out.println("\n");
-                }
+            for (String paragraph : paragraphs) {
+                System.out.println(paragraph);
+                System.out.println("\n");
+            }
             printIfVerbose("\n");
         } else {
             try {
                 printIfVerbose("Dumping story to file...");
                 BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outputFile)));
-                for(String paragraph: paragraphs){
+                for (String paragraph : paragraphs) {
                     writer.write(paragraph);
                     writer.write("\n");
                 }
@@ -204,11 +206,11 @@ public class Boot {
             }
         }
     }
-    
+
     /**
      * Read in any text file the DerpyWriter will use.
-     * 
-     * @throws InterruptedException 
+     *
+     * @throws InterruptedException
      */
     public static void readSources() throws InterruptedException {
         if (sources.size() != 0) {
@@ -228,7 +230,7 @@ public class Boot {
                         if ((i * threads) + o >= sources.size()) {
                             break;
                         }
-                        DerpyReader derpyReader = new DerpyReader(dictionary,sources.get((i * threads) + o));
+                        DerpyReader derpyReader = new DerpyReader(dictionary, sources.get((i * threads) + o));
                         t[o] = new Thread(derpyReader);
                         t[o].run();
                     }
@@ -241,23 +243,20 @@ public class Boot {
                 }
 
                 printIfVerbose("Sources read...");
-            } else if (!threadable)
-            {
+            } else if (!threadable) {
                 int largestWords = -1;
                 int largestWeight = -1;
-                for(int i = 0; i<sources.size(); i++)
-                {
+                for (int i = 0; i < sources.size(); i++) {
                     Dictionary tmp = new Dictionary();
                     new DerpyReader(tmp, sources.get(i)).run();
                     int tmpMax = tmp.getWordCount();
-                    if(tmpMax > largestWords)
-                    {
-                         largestWords = tmpMax;
-                         largestWeight = weights.get(i);
+                    if (tmpMax > largestWords) {
+                        largestWords = tmpMax;
+                        largestWeight = weights.get(i);
                     }
                 }
                 for (int i = 0; i < sources.size(); i++) {
-                    int myWords = ((largestWords*weights.get(i))/largestWeight);
+                    int myWords = ((largestWords * weights.get(i)) / largestWeight);
                     DerpyReader derpyReader = new DerpyReader(dictionary, sources.get(i), myWords);
                     derpyReader.run();
                 }
@@ -332,7 +331,7 @@ public class Boot {
 
     /**
      * Method for checking command line flags
-     * 
+     *
      * @param args The arguments
      */
     public static void checkFlags(String[] args) {
@@ -404,29 +403,40 @@ public class Boot {
                         ++i;
                         threadable = false;
                         if (isFilenameValid(args[i])) {
-                                if (new File(args[i]).exists()) {
-                                    sources.add(new File(args[i]).getAbsolutePath());
-                                    weights.add(weight);
-                                }
-                            } else {
-                                System.out.println("Invalid filename: " + args[i]);
-                                System.exit(0);
+                            if (new File(args[i]).exists()) {
+                                sources.add(new File(args[i]).getAbsolutePath());
+                                weights.add(weight);
                             }
+                        } else {
+                            System.out.println("Invalid filename: " + args[i]);
+                            System.exit(0);
+                        }
                     }
                 } catch (Exception e) {
                     System.out.println("Argument must be a positive integer");
                     System.exit(0);
                 }
-            } else if(args[i].equals("-f")){
+            } else if (args[i].equals("-fo")) {
                 i++;
-                
-                if(args[i].toLowerCase().equals("plaintext") || args[i].toLowerCase().equals("text") || args[i].toLowerCase().equals("txt")){
+
+                if (args[i].toLowerCase().equals("plaintext") || args[i].toLowerCase().equals("text") || args[i].toLowerCase().equals("txt")) {
                     fileOutputFormat = DerpyFormatter.DERPY_FORMAT_PLAINTEXT;
-                } else if(args[i].toLowerCase().equals("html") || args[i].toLowerCase().equals("htm")){
+                } else if (args[i].toLowerCase().equals("html") || args[i].toLowerCase().equals("htm")) {
                     fileOutputFormat = DerpyFormatter.DERPY_FORMAT_HTML;
                 }
-                
-            }else {
+
+            } else if (args[i].equals("-fi")) {
+                i++;
+
+                if (args[i].toLowerCase().equals("plaintext") || args[i].toLowerCase().equals("text") || args[i].toLowerCase().equals("txt")) {
+                    fileInputFormat = DerpyFormatter.DERPY_FORMAT_PLAINTEXT;
+                } else if (args[i].toLowerCase().equals("html") || args[i].toLowerCase().equals("htm")) {
+                    fileInputFormat = DerpyFormatter.DERPY_FORMAT_HTML;
+                } else if (args[i].toLowerCase().equals("normal") || args[i].toLowerCase().equals("norm")) {
+                    fileInputFormat = DerpyFormatter.DERPY_FORMAT_TEXT;
+                }
+
+            } else {
                 // Assume a relative path if not absolute
                 if (isFilenameValid(args[i])) {
                     if (new File(args[i]).exists()) {
