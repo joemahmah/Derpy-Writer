@@ -46,26 +46,6 @@ import java.util.logging.Logger;
  */
 public class Boot {
 
-    public static ArrayList<String> sources = new ArrayList<>();
-    public static ArrayList<Integer> weights = new ArrayList<>();
-    public static int accuracy = 1;
-    public static int accuracy_write = 0;
-    public static int dictionary_accuracy = 0;
-    public static int output = 100;
-    public static String outputFile = null;
-    public static String inputDictionary = null;
-    public static String outputDictionary = null;
-    public static int threads = 1;
-    public static boolean ignorePunctuation = false;
-    public static boolean write = true;
-    public static boolean VERBOSE = false;
-    public static boolean formatText = true;
-    public static boolean threadable = true;
-    public static int fileOutputFormat = DerpyFormatter.DERPY_FORMAT_PLAINTEXT;
-    public static int fileInputFormat = DerpyFormatter.DERPY_FORMAT_TEXT;
-
-    private static Dictionary dictionary;
-
     public static void showUsage() {
         System.out.println("Usage:");
         System.out.println("java -jar DerpyWriter.jar <arguments>\n");
@@ -103,7 +83,7 @@ public class Boot {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        
+
         if (args.length == 0) {
             DerpyGUI gui = new DerpyGUI();
         } else {
@@ -111,225 +91,45 @@ public class Boot {
             checkFlags(args);
             checkIfHasWritingSource();
 
-            dictionary = new Dictionary();
+            DerpyManager.setDictionary(new Dictionary());
 
-            if (inputDictionary != null) {
-                loadDictionary();
+            if (DerpyManager.getInputDictionary() != null) {
+                DerpyManager.loadDictionary();
             }
 
-            setWordAccuracy();
-            readSources();
-            checkIfRequestedAccuracyIsWithinAcceptableBounds();
+            DerpyManager.setWordAccuracy();
+            DerpyManager.readSources();
+            DerpyManager.checkIfRequestedAccuracyIsWithinAcceptableBounds();
 
-            if (write) {
-                write();
+            if (DerpyManager.shouldWrite()) {
+                DerpyManager.write();
             } else {
                 printIfVerbose("Write skipped...");
             }
 
-            if (outputDictionary != null) {
-                saveDictionary();
+            if (DerpyManager.getOutputDictionary() != null) {
+                DerpyManager.saveDictionary();
             }
         }
     }
 
     public static void printIfVerbose(String msg) {
-        if (VERBOSE) {
+        if (DerpyManager.isVERBOSE()) {
             System.out.println(msg);
         }
     }
 
     public static void printIfNotVerbose(String msg) {
-        if (!VERBOSE) {
+        if (!DerpyManager.isVERBOSE()) {
             System.out.println(msg);
         }
     }
 
-    public static void checkIfRequestedAccuracyIsWithinAcceptableBounds() {
-        if (Word.accuracyNumber > accuracy_write && accuracy_write != 0) {
-            printIfVerbose("Requested accuracy is within acceptable parameters...");
-            printIfVerbose("Setting accuracy to " + accuracy_write);
-            Word.setAccuracyNumber(accuracy_write);
-            dictionary.regenerateLastWords();
-        }
-    }
-
     public static void checkIfHasWritingSource() {
-        if (sources.size() < 1 && inputDictionary == null) {
+        if (DerpyManager.getSources().size() < 1 && DerpyManager.getInputDictionary() == null) {
             System.out.println("This requires at least one source file");
             showUsage();
             System.exit(0);
-        }
-    }
-
-    public static void setWordAccuracy() {
-        printIfVerbose("Setting accuracy to " + accuracy + "...");
-
-        Word.setAccuracyNumber(accuracy); //2-3 for songs, more for texts
-        dictionary.regenerateLastWords();
-    }
-
-    public static void write() {
-        printIfVerbose("Writing...");
-
-        if (ignorePunctuation) {
-            printIfVerbose("Ignoring logical punctuation...");
-        }
-
-        DerpyWriter.setIgnorePunctuation(ignorePunctuation); //This will allow end punctuation to be placed close together. If this is not wanted, this value should be false...
-        DerpyWriter dw = new DerpyWriter(dictionary);
-        List<String> paragraphs = dw.generateStory(output);
-
-        if (formatText) {
-            paragraphs = DerpyFormatter.formatParagraphs(paragraphs, fileOutputFormat);
-        }
-
-        printIfVerbose("Story created...");
-        printIfVerbose("Determining write location...");
-
-        if (outputFile == null) {
-            printIfVerbose("Write location not found...");
-            printIfVerbose("Dumping to console!\n");
-            for (String paragraph : paragraphs) {
-                System.out.println(paragraph);
-                System.out.println("\n");
-            }
-            printIfVerbose("\n");
-        } else {
-            try {
-                printIfVerbose("Dumping story to file...");
-                BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outputFile)));
-                for (String paragraph : paragraphs) {
-                    writer.write(paragraph);
-                    writer.write("\n");
-                }
-                writer.close();
-                printIfVerbose("Finished dumping story...");
-            } catch (IOException ex) {
-                Logger.getLogger(Boot.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
-
-    /**
-     * Read in any text file the DerpyWriter will use.
-     *
-     * @throws InterruptedException
-     */
-    public static void readSources() throws InterruptedException {
-        if (sources.size() != 0) {
-            printIfVerbose("Sources detected...");
-            if (threads > 1 && threadable) {
-
-                printIfVerbose("Distributing work over " + threads + " threads...");
-
-                int count = sources.size() / threads;
-                if (sources.size() % threads != 0) {
-                    count++;
-                }
-
-                for (int i = 0; i < count; i++) {
-                    Thread t[] = new Thread[threads];
-                    for (int o = 0; o < threads; o++) {
-                        if ((i * threads) + o >= sources.size()) {
-                            break;
-                        }
-                        DerpyReader derpyReader = new DerpyReader(dictionary, sources.get((i * threads) + o));
-                        t[o] = new Thread(derpyReader);
-                        t[o].run();
-                    }
-                    for (int o = 0; o < threads; o++) {
-                        if ((i * threads) + o >= sources.size()) {
-                            break;
-                        }
-                        t[o].join();
-                    }
-                }
-
-                printIfVerbose("Sources read...");
-            } else if (!threadable) {
-                int largestWords = -1;
-                int largestWeight = -1;
-                for (int i = 0; i < sources.size(); i++) {
-                    Dictionary tmp = new Dictionary();
-                    new DerpyReader(tmp, sources.get(i)).run();
-                    int tmpMax = tmp.getWordCount();
-                    if (tmpMax > largestWords) {
-                        largestWords = tmpMax;
-                        largestWeight = weights.get(i);
-                    }
-                }
-                for (int i = 0; i < sources.size(); i++) {
-                    int myWords = ((largestWords * weights.get(i)) / largestWeight);
-                    DerpyReader derpyReader = new DerpyReader(dictionary, sources.get(i), myWords);
-                    derpyReader.run();
-                }
-                printIfVerbose("Sources read...");
-            } else {
-                for (int i = 0; i < sources.size(); i++) {
-                    DerpyReader derpyReader = new DerpyReader(dictionary, sources.get(i));
-                    derpyReader.run();
-                }
-
-                printIfVerbose("Sources read...");
-            }
-        }
-    }
-
-    /**
-     * Saves a local dictionary into file.
-     */
-    public static void saveDictionary() {
-        try {
-            printIfVerbose("Dumping dictionary...");
-            if (inputDictionary != null) {
-                printIfVerbose("Returning accuracy to dictionary accuracy...");
-                Word.setAccuracyNumber(dictionary_accuracy);
-                dictionary.regenerateLastWords();
-            }
-            ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(outputDictionary))));
-            oos.writeInt(Word.accuracyNumber);
-            for (Word word : dictionary.getWordList()) {
-                oos.writeObject(word);
-                oos.flush();
-            }
-            oos.close();
-            printIfVerbose("Dictionary dumped...");
-        } catch (IOException e) {
-            System.err.println("Unable to save file! Ignoring any changes made!");
-        }
-    }
-
-    /**
-     * Method to load a file of words into a local dictionary
-     */
-    public static void loadDictionary() {
-        try {
-            printIfVerbose("Loading dictionary...");
-
-            ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(new File(inputDictionary))));
-            dictionary_accuracy = accuracy = ois.readInt();
-
-            printIfVerbose("Dictionary accuracy read... " + accuracy);
-            printIfVerbose("Reading words...");
-
-            boolean hasWords = true;
-            while (hasWords) {
-                try {
-                    dictionary.addWord((Word) ois.readObject());
-                } catch (Exception e) {
-                    printIfVerbose("Finished reading words...");
-                    printIfVerbose("Total word count: " + dictionary.getSize());
-                    hasWords = false;
-                }
-            }
-            ois.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-
-            printIfVerbose("The dictionary at " + inputDictionary + " could not be loaded...");
-            printIfVerbose("Using empty dictionary!");
-            printIfNotVerbose("Dictionary not found! Using empty dictionary...");
         }
     }
 
@@ -342,9 +142,9 @@ public class Boot {
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-a")) {
                 try {
-                    accuracy = Integer.parseInt(args[++i]);
-                    accuracy_write = accuracy;
-                    if (accuracy < 0) {
+                    DerpyManager.setAccuracy(Integer.parseInt(args[++i]));
+                    DerpyManager.setAccuracy_write(DerpyManager.getAccuracy());
+                    if (DerpyManager.getAccuracy() < 0) {
                         System.out.println("Argument must be a positive integer");
                         System.exit(0);
                     }
@@ -354,8 +154,8 @@ public class Boot {
                 }
             } else if (args[i].equals("-c")) {
                 try {
-                    output = Integer.parseInt(args[++i]);
-                    if (output < 0) {
+                    DerpyManager.setOutput(Integer.parseInt(args[++i]));
+                    if (DerpyManager.getOutput() < 0) {
                         System.out.println("Argument must be a positive integer");
                         System.exit(0);
                     }
@@ -368,24 +168,24 @@ public class Boot {
                 System.exit(0);
             } else if (args[i].equals("-o")) {
                 if (!args[++i].equals("-")) {
-                    outputFile = args[i];
+                    DerpyManager.setOutputFile(args[i]);
                 }
             } else if (args[i].equals("-l")) {
                 if (!args[++i].equals("-")) {
-                    inputDictionary = args[i];
+                    DerpyManager.setInputDictionary(args[i]);
                 }
             } else if (args[i].equals("-v")) {
-                VERBOSE = true;
+                DerpyManager.setVERBOSE(true);
             } else if (args[i].equals("-nf")) {
-                formatText = false;
+                DerpyManager.setFormatText(false);
             } else if (args[i].equals("-s")) {
                 if (!args[++i].equals("-")) {
-                    outputDictionary = args[i];
+                    DerpyManager.setOutputDictionary(args[i]);
                 }
             } else if (args[i].equals("-t")) {
                 try {
-                    threads = Integer.parseInt(args[++i]);
-                    if (threads < 1) {
+                    DerpyManager.setThreads(Integer.parseInt(args[++i]));
+                    if (DerpyManager.getThreads() < 1) {
                         System.out.println("Argument must be a positive integer greater than 1");
                         System.exit(0);
                     }
@@ -394,9 +194,9 @@ public class Boot {
                     System.exit(0);
                 }
             } else if (args[i].equals("-i")) {
-                ignorePunctuation = true;
+                DerpyManager.setIgnorePunctuation(true);
             } else if (args[i].equals("-r")) {
-                write = false;
+                DerpyManager.setWrite(false);
             } else if (args[i].equals("-w")) {
                 try {
                     int weight = Integer.parseInt(args[++i]);
@@ -405,11 +205,11 @@ public class Boot {
                         System.exit(0);
                     } else {
                         ++i;
-                        threadable = false;
+                        DerpyManager.setThreadable(false);
                         if (isFilenameValid(args[i])) {
                             if (new File(args[i]).exists()) {
-                                sources.add(new File(args[i]).getAbsolutePath());
-                                weights.add(weight);
+                                DerpyManager.getSources().add(new File(args[i]).getAbsolutePath());
+                                DerpyManager.getWeights().add(weight);
                             }
                         } else {
                             System.out.println("Invalid filename: " + args[i]);
@@ -424,28 +224,28 @@ public class Boot {
                 i++;
 
                 if (args[i].toLowerCase().equals("plaintext") || args[i].toLowerCase().equals("text") || args[i].toLowerCase().equals("txt")) {
-                    fileOutputFormat = DerpyFormatter.DERPY_FORMAT_PLAINTEXT;
+                    DerpyManager.setFileOutputFormat(DerpyFormatter.DERPY_FORMAT_PLAINTEXT);
                 } else if (args[i].toLowerCase().equals("html") || args[i].toLowerCase().equals("htm")) {
-                    fileOutputFormat = DerpyFormatter.DERPY_FORMAT_HTML;
+                    DerpyManager.setFileOutputFormat(DerpyFormatter.DERPY_FORMAT_HTML);
                 }
 
             } else if (args[i].equals("-fi")) {
                 i++;
 
                 if (args[i].toLowerCase().equals("plaintext") || args[i].toLowerCase().equals("text") || args[i].toLowerCase().equals("txt")) {
-                    fileInputFormat = DerpyFormatter.DERPY_FORMAT_PLAINTEXT;
+                    DerpyManager.setFileInputFormat(DerpyFormatter.DERPY_FORMAT_PLAINTEXT);
                 } else if (args[i].toLowerCase().equals("html") || args[i].toLowerCase().equals("htm")) {
-                    fileInputFormat = DerpyFormatter.DERPY_FORMAT_HTML;
+                    DerpyManager.setFileInputFormat(DerpyFormatter.DERPY_FORMAT_HTML);
                 } else if (args[i].toLowerCase().equals("normal") || args[i].toLowerCase().equals("norm")) {
-                    fileInputFormat = DerpyFormatter.DERPY_FORMAT_TEXT;
+                    DerpyManager.setFileInputFormat(DerpyFormatter.DERPY_FORMAT_TEXT);
                 }
 
             } else {
                 // Assume a relative path if not absolute
                 if (isFilenameValid(args[i])) {
                     if (new File(args[i]).exists()) {
-                        sources.add(new File(args[i]).getAbsolutePath());
-                        weights.add(1);
+                        DerpyManager.getSources().add(new File(args[i]).getAbsolutePath());
+                        DerpyManager.getWeights().add(1);
                     }
                 } else {
                     System.out.println("Invalid filename: " + args[i]);

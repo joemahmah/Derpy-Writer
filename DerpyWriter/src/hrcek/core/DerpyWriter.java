@@ -107,7 +107,7 @@ public class DerpyWriter {
                     story.add(paragraph.toString());
                     paragraph = "";
 
-                    if (Boot.VERBOSE) {
+                    if (DerpyManager.isVERBOSE()) {
                         System.out.println("Wrote Paragraph " + story.size() + "...");
                     }
                 } else {
@@ -121,10 +121,10 @@ public class DerpyWriter {
 
         return story;
     }
-    
-    private boolean ignoreFirstParagraph(){
-        boolean ignore = Boot.fileInputFormat == DerpyFormatter.DERPY_FORMAT_HTML;
-    
+
+    private boolean ignoreFirstParagraph() {
+        boolean ignore = DerpyManager.getFileInputFormat() == DerpyFormatter.DERPY_FORMAT_HTML;
+
         return ignore;
     }
 

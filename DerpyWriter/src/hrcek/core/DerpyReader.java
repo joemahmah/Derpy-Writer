@@ -73,7 +73,7 @@ public class DerpyReader implements Runnable {
             while (fileReader.ready()) {
                 String line = fileReader.readLine();
                 if (line.length() > 0) {
-                    line = DerpyFormatter.unformatText(line, Boot.fileInputFormat);
+                    line = DerpyFormatter.unformatText(line, DerpyManager.getFileInputFormat());
                     String[] words = line.split(" ");
                     for (String word : words) {
                         if (!word.equals("") && !word.equals(" ")) {
