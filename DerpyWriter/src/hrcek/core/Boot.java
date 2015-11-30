@@ -103,30 +103,34 @@ public class Boot {
     }
 
     public static void main(String[] args) throws InterruptedException {
-
-        checkFlags(args);
-        checkIfHasWritingSource();
-
-        dictionary = new Dictionary();
-
-        if (inputDictionary != null) {
-            loadDictionary();
-        }
-
-        setWordAccuracy();
-        readSources();
-        checkIfRequestedAccuracyIsWithinAcceptableBounds();
-
-        if (write) {
-            write();
+        
+        if (args.length == 0) {
+            DerpyGUI gui = new DerpyGUI();
         } else {
-            printIfVerbose("Write skipped...");
-        }
 
-        if (outputDictionary != null) {
-            saveDictionary();
-        }
+            checkFlags(args);
+            checkIfHasWritingSource();
 
+            dictionary = new Dictionary();
+
+            if (inputDictionary != null) {
+                loadDictionary();
+            }
+
+            setWordAccuracy();
+            readSources();
+            checkIfRequestedAccuracyIsWithinAcceptableBounds();
+
+            if (write) {
+                write();
+            } else {
+                printIfVerbose("Write skipped...");
+            }
+
+            if (outputDictionary != null) {
+                saveDictionary();
+            }
+        }
     }
 
     public static void printIfVerbose(String msg) {
