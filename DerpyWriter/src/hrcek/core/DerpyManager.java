@@ -25,6 +25,7 @@ package hrcek.core;
 
 import static hrcek.core.Boot.printIfNotVerbose;
 import static hrcek.core.Boot.printIfVerbose;
+import static hrcek.core.Boot.showUsage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
@@ -64,6 +65,8 @@ public class DerpyManager {
     public static int fileOutputFormat = DerpyFormatter.DERPY_FORMAT_PLAINTEXT;
     public static int fileInputFormat = DerpyFormatter.DERPY_FORMAT_TEXT;
 
+    private static boolean hasBeenRead = false;
+
     private static Dictionary dictionary;
 
     //TODO:
@@ -75,6 +78,14 @@ public class DerpyManager {
 
     public static void setSources(List<String> sources) {
         DerpyManager.sources = sources;
+    }
+
+    public static boolean isHasBeenRead() {
+        return hasBeenRead;
+    }
+
+    public static void setHasBeenRead(boolean hasBeenRead) {
+        DerpyManager.hasBeenRead = hasBeenRead;
     }
 
     public static List<Integer> getWeights() {
@@ -391,6 +402,13 @@ public class DerpyManager {
             Word.setAccuracyNumber(accuracy_write);
             dictionary.regenerateLastWords();
         }
+    }
+
+    public static boolean checkIfHasWritingSource() {
+        if (DerpyManager.getSources().size() < 1 && DerpyManager.getInputDictionary() == null) {
+            return false;
+        }
+        return true;
     }
 
 }

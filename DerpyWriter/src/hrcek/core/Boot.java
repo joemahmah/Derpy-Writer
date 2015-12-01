@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.UIManager;
 
 /**
  *
@@ -67,6 +68,31 @@ public class Boot {
         System.out.println("\t-fi <txt,normal,html> Input text as a format (Default normal)");
     }
 
+    public static String showUsageAsString() {
+        String msg = "";
+
+        msg += "Usage:";
+        msg += "java -jar DerpyWriter.jar <arguments>\n\n";
+        msg += "\tArguments:\n";
+        msg += "\t<source files>        plaintext files used for source\n";
+        msg += "\t-a [#]                accuracy (default 1)\n";
+        msg += "\t-c [#]                output count (default 100)\n";
+        msg += "\t-h      --help        display this text\n";
+        msg += "\t-o [FILE]             output file (default stdout, hyphen for stdout)\n";
+        msg += "\t-t [#]                thread count (default 1)\n";
+        msg += "\t-i                    ignore logical punctuation checking.\n";
+        msg += "\t-l [FILE]             load dictionary file.\n";
+        msg += "\t-s [FILE]             save dictionary file.\n";
+        msg += "\t-r                    only read files.\n";
+        msg += "\t-v                    verbose mode\n";
+        msg += "\t-w [#] [FILE]         weight a file relative to the other files\n";
+        msg += "\t-nf                   do not format text\n";
+        msg += "\t-fo <txt,html>        Output text as a format (Default plaintext)\n";
+        msg += "\t-fi <txt,normal,html> Input text as a format (Default normal)\n";
+
+        return msg;
+    }
+
     /**
      *
      * @param file the filename.
@@ -89,7 +115,11 @@ public class Boot {
         } else {
 
             checkFlags(args);
-            checkIfHasWritingSource();
+            if (!DerpyManager.checkIfHasWritingSource()) {
+                System.out.println("This requires at least one source file");
+                showUsage();
+                System.exit(1);
+            }
 
             DerpyManager.setDictionary(new Dictionary());
 
@@ -122,14 +152,6 @@ public class Boot {
     public static void printIfNotVerbose(String msg) {
         if (!DerpyManager.isVERBOSE()) {
             System.out.println(msg);
-        }
-    }
-
-    public static void checkIfHasWritingSource() {
-        if (DerpyManager.getSources().size() < 1 && DerpyManager.getInputDictionary() == null) {
-            System.out.println("This requires at least one source file");
-            showUsage();
-            System.exit(0);
         }
     }
 
