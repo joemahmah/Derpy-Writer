@@ -45,6 +45,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
@@ -63,6 +64,8 @@ public class DerpyGUI extends JFrame {
     JPanel aboutPanel;
 
     public DerpyGUI() {
+
+        final JTextArea outputText = new JTextArea();
 
         //Control Area
         controlPanel = new JPanel(new GridBagLayout());
@@ -126,7 +129,7 @@ public class DerpyGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (DerpyManager.getDictionary() != null) {
-                    DerpyManager.write();
+                    outputText.setText(DerpyManager.write());
                 } else {
                     JOptionPane.showMessageDialog(null, "Dictionary is empty! Read material or load a dictionary to write!");
                 }
@@ -138,7 +141,14 @@ public class DerpyGUI extends JFrame {
         controlPanel.add(writeButton);
 
         //Control Area
-        outputPanel = new JPanel(new GridBagLayout());
+        outputPanel = new JPanel(new GridLayout(1, 1));
+
+        outputText.setEditable(false);
+        outputText.setLineWrap(true);
+        outputText.setWrapStyleWord(true);
+        JScrollPane outputPane = new JScrollPane(outputText);
+
+        outputPanel.add(outputPane);
 
         //Settings Area
         settingsPanel = new JPanel(new GridLayout(15, 1));
@@ -221,7 +231,7 @@ public class DerpyGUI extends JFrame {
         mainPane.addTab("About/Help", aboutPanel);
 
         setSize(800, 800);
-        setResizable(false);
+        setResizable(true);
         setTitle("Derpy Writer");
         setContentPane(mainPane);
         setDefaultCloseOperation(EXIT_ON_CLOSE);

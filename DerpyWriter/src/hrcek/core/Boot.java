@@ -132,7 +132,7 @@ public class Boot {
             DerpyManager.checkIfRequestedAccuracyIsWithinAcceptableBounds();
 
             if (DerpyManager.shouldWrite()) {
-                DerpyManager.write();
+                System.out.println(DerpyManager.write());
             } else {
                 printIfVerbose("Write skipped...");
             }

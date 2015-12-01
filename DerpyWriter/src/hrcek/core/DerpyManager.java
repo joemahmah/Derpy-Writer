@@ -224,7 +224,7 @@ public class DerpyManager {
         DerpyManager.dictionary = dictionary;
     }
 
-    public static void write() {
+    public static String write() {
         printIfVerbose("Writing...");
 
         if (ignorePunctuation) {
@@ -245,11 +245,11 @@ public class DerpyManager {
         if (outputFile == null) {
             printIfVerbose("Write location not found...");
             printIfVerbose("Dumping to console!\n");
+            String allParagraphs = "";
             for (String paragraph : paragraphs) {
-                System.out.println(paragraph);
-                System.out.println("\n");
+                allParagraphs += paragraph + "\n\n";
             }
-            printIfVerbose("\n");
+            return allParagraphs;
         } else {
             try {
                 printIfVerbose("Dumping story to file...");
@@ -263,6 +263,8 @@ public class DerpyManager {
             } catch (IOException ex) {
                 Logger.getLogger(Boot.class.getName()).log(Level.SEVERE, null, ex);
             }
+
+            return "";
         }
     }
 
