@@ -35,6 +35,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.text.NumberFormat;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -65,7 +66,7 @@ public class DerpyGUI extends JFrame {
 
     public DerpyGUI() {
 
-        final JTextArea outputText = new JTextArea();
+        final JTextArea outputText = new JTextArea(openingOutputText());
 
         //Control Area
         controlPanel = new JPanel(new GridBagLayout());
@@ -236,6 +237,19 @@ public class DerpyGUI extends JFrame {
         setContentPane(mainPane);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
+
+    }
+
+    private static String openingOutputText() {
+        String msg;
+
+        if (Math.random() < .3) {
+            msg = "おはようございます！私の名前は、Derpy Writerです。何が書きますか。";
+        } else {
+            msg = "Howdy! Feel free to call me Derpy Writer. What should I write?";
+        }
+
+        return msg;
 
     }
 
