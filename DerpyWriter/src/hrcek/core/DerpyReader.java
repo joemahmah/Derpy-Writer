@@ -75,10 +75,9 @@ public class DerpyReader implements Runnable {
                 if (line.length() > 0) {
                     line = DerpyFormatter.unformatText(line, DerpyManager.getFileInputFormat());
                     String[] words = line.split(" ");
+                    DerpyReader.mergeWords(words, DerpyManager.getFileInputFormat());
                     for (String word : words) {
-                        if (!word.equals("") && !word.equals(" ")) {
-                            dictionary.addWord(word.toLowerCase());
-                        }
+                        DerpyReader.addWord(word, DerpyManager.getFileInputFormat());
                     }
                 }
             }
@@ -91,6 +90,7 @@ public class DerpyReader implements Runnable {
                     if (line.length() > 0) {
                         line = DerpyFormatter.unformatText(line);
                         String[] words = line.split(" ");
+                        DerpyReader.mergeWords(words, DerpyManager.getFileInputFormat());
                         for (String word : words) {
                             if (!word.isEmpty()) {
                                 dictionary.addWord(word.toLowerCase());
@@ -128,6 +128,46 @@ public class DerpyReader implements Runnable {
             return true;
         }
         return false;
+    }
+
+    public static void mergeWords(String[] wordList, int fileInputFormat) {
+        for (int index = wordList.length - 1; index >= 0; index--) {
+            switch (fileInputFormat) {
+                case DerpyFormatter.DERPY_FORMAT_HTML:
+                    if (wordList[index].equals(">")) {
+                        int origIndex = index;
+                        while (index > 0) {
+                            if (wordList[index--].equals("<")) {
+                                String newWord = wordList[index] + " ";
+                                for (int i = index + 1; i <= origIndex; i++) {
+                                    newWord += wordList[i] + " ";
+                                    wordList[i] = "";
+                                }
+                                wordList[index] = newWord;
+                                break;
+                            }
+                        }
+                    }
+            }
+        }
+    }
+
+    public static void addWord(String word, int fileInputType) {
+        switch (fileInputType) {
+            case DerpyFormatter.DERPY_FORMAT_HTML:
+                if (!word.equals("") && !word.equals(" ")) {
+                    if (word.startsWith("<") && word.endsWith(">")) {
+                        DerpyManager.getDictionary().addTag(word.toLowerCase());
+                    } else {
+                        DerpyManager.getDictionary().addWord(word.toLowerCase());
+                    }
+                }
+                break;
+            default:
+                if (!word.equals("") && !word.equals(" ")) {
+                    DerpyManager.getDictionary().addWord(word.toLowerCase());
+                }
+        }
     }
 
     public static boolean isEndPunctuation(Word word) {
