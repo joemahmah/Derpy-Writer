@@ -65,6 +65,9 @@ public class DerpyManager {
     public static int fileOutputFormat = DerpyFormatter.DERPY_FORMAT_PLAINTEXT;
     public static int fileInputFormat = DerpyFormatter.DERPY_FORMAT_TEXT;
 
+    
+    public static String stdin;
+    
     private static boolean hasBeenRead = false;
 
     private static Dictionary dictionary;

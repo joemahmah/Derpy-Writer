@@ -27,6 +27,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -68,38 +69,56 @@ public class DerpyReader implements Runnable {
 
         //TODO ADD ERROR CHECKING
         if (numWords < 0) {
-            BufferedReader fileReader = new BufferedReader(new FileReader(fileLocation));
-
+            BufferedReader fileReader = null;
+            if (fileLocation.equals("*STDIN*")) {
+                fileReader = new BufferedReader(new StringReader(DerpyManager.stdin));
+            } else {
+                fileReader = new BufferedReader(new FileReader(fileLocation));
+            }
             while (fileReader.ready()) {
                 String line = fileReader.readLine();
-                if (line.length() > 0) {
-                    line = DerpyFormatter.unformatText(line, DerpyManager.getFileInputFormat());
-                    String[] words = line.split(" ");
-                    for (String word : words) {
-                        if (!word.equals("") && !word.equals(" ")) {
-                            dictionary.addWord(word.toLowerCase());
+                if (line != null) {
+                    if (line.length() > 0) {
+                        line = DerpyFormatter.unformatText(line, DerpyManager.getFileInputFormat());
+                        String[] words = line.split(" ");
+                        for (String word : words) {
+                            if (!word.equals("") && !word.equals(" ")) {
+                                dictionary.addWord(word.toLowerCase());
+                            }
                         }
                     }
+                } else {
+                    break;
                 }
+
             }
         } else {
             int initSize = dictionary.getWordCount();
             while (dictionary.getWordCount() - initSize < numWords) {
-                BufferedReader fileReader = new BufferedReader(new FileReader(fileLocation));
+                BufferedReader fileReader = null;
+                if (fileLocation.equals("*STDIN*")) {
+                    fileReader = new BufferedReader(new StringReader(DerpyManager.stdin));
+                } else {
+                    fileReader = new BufferedReader(new FileReader(fileLocation));
+                }
                 while (fileReader.ready()) {
                     String line = fileReader.readLine();
-                    if (line.length() > 0) {
-                        line = DerpyFormatter.unformatText(line);
-                        String[] words = line.split(" ");
-                        for (String word : words) {
-                            if (!word.isEmpty()) {
-                                dictionary.addWord(word.toLowerCase());
-                            }
-                            if (dictionary.getWordCount() - initSize >= numWords) {
-                                fileReader.close();
-                                return;
+                    if (line != null) {
+                        if (line.length() > 0) {
+                            line = DerpyFormatter.unformatText(line);
+                            String[] words = line.split(" ");
+                            for (String word : words) {
+                                if (!word.isEmpty()) {
+                                    dictionary.addWord(word.toLowerCase());
+                                }
+                                if (dictionary.getWordCount() - initSize >= numWords) {
+                                    fileReader.close();
+                                    return;
+                                }
                             }
                         }
+                    } else {
+                        break;
                     }
                 }
             }
