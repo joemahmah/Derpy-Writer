@@ -25,6 +25,7 @@ package hrcek.core;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.File;
@@ -32,6 +33,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -99,6 +101,14 @@ public class Boot {
      * @return true if the file can be opened.
      */
     public static boolean isFilenameValid(String file) {
+        final char[] ILLEGAL_CHARACTERS = { '/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':' };
+        for(int i = 0; i<ILLEGAL_CHARACTERS.length; i++)
+        {
+            if(file.contains(Character.toString(ILLEGAL_CHARACTERS[i])))
+            {
+                return false;
+            }
+        }
         File f = new File(file);
         try {
             f.getCanonicalPath();
@@ -233,6 +243,24 @@ public class Boot {
                                 DerpyManager.getSources().add(new File(args[i]).getAbsolutePath());
                                 DerpyManager.getWeights().add(weight);
                             }
+                        } else if (args[i].toLowerCase().equals("*stdin*")) {
+                            if (DerpyManager.stdin == null) {
+                                BufferedReader derpReader = new BufferedReader(new InputStreamReader(System.in));
+                                StringBuilder builder = new StringBuilder();
+                                String aux = "";
+
+                                try {
+                                    while ((aux = derpReader.readLine()) != null) {
+                                        builder.append(aux);
+                                        builder.append('\n');
+                                    }
+                                } catch (IOException ex) {
+                                    Logger.getLogger(Boot.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                                DerpyManager.stdin = builder.toString();
+                            }
+                            DerpyManager.getSources().add("*STDIN*");
+                            DerpyManager.getWeights().add(weight);
                         } else {
                             System.out.println("Invalid filename: " + args[i]);
                             System.exit(0);
@@ -269,6 +297,24 @@ public class Boot {
                         DerpyManager.getSources().add(new File(args[i]).getAbsolutePath());
                         DerpyManager.getWeights().add(1);
                     }
+                } else if (args[i].toLowerCase().equals("*stdin*")) {
+                    if (DerpyManager.stdin == null) {
+                        BufferedReader derpReader = new BufferedReader(new InputStreamReader(System.in));
+                        StringBuilder builder = new StringBuilder();
+                        String aux = "";
+
+                        try {
+                            while ((aux = derpReader.readLine()) != null) {
+                                builder.append(aux);
+                                builder.append('\n');
+                            }
+                        } catch (IOException ex) {
+                            Logger.getLogger(Boot.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        DerpyManager.stdin = builder.toString();
+                    }
+                    DerpyManager.getSources().add("*STDIN*");
+                    DerpyManager.getWeights().add(1);
                 } else {
                     System.out.println("Invalid filename: " + args[i]);
                     System.exit(0);
