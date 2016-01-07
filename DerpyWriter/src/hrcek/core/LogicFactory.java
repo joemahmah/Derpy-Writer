@@ -126,8 +126,14 @@ public class LogicFactory {
             pastWords[0] = wordList.get(getRandomInt(wordList.size()));
             return pastWords[0];
         } else {
-            pastWords[0] = Word.wordNotFound;
-            return Word.wordNotFound;
+            DerpyLogger.warning(pastWords[0].getName() + " has no words following it!");
+            if (DerpyManager.inStrictMode()) {
+                pastWords[0] = Word.wordNotFound;
+                return Word.wordNotFound;
+            } else {
+                pastWords[0] = getRandomWord(dictionary);
+                return pastWords[0];
+            }
         }
 
     }

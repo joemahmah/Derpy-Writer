@@ -62,12 +62,12 @@ public class DerpyManager {
     public static boolean VERBOSE = false;
     public static boolean formatText = true;
     public static boolean threadable = true;
+    public static boolean strictMode = false;
     public static int fileOutputFormat = DerpyFormatter.DERPY_FORMAT_PLAINTEXT;
     public static int fileInputFormat = DerpyFormatter.DERPY_FORMAT_TEXT;
 
-    
     public static String stdin;
-    
+
     private static boolean hasBeenRead = false;
 
     private static Dictionary dictionary;
@@ -264,7 +264,7 @@ public class DerpyManager {
                 writer.close();
                 printIfVerbose("Finished dumping story...");
             } catch (IOException ex) {
-                Logger.getLogger(Boot.class.getName()).log(Level.SEVERE, null, ex);
+                DerpyLogger.error(ex);
             }
 
             return "";
@@ -385,7 +385,7 @@ public class DerpyManager {
             }
             ois.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            DerpyLogger.warning(e, "Could not load dictionary.");
 
             printIfVerbose("The dictionary at " + inputDictionary + " could not be loaded...");
             printIfVerbose("Using empty dictionary!");
@@ -414,6 +414,14 @@ public class DerpyManager {
             return false;
         }
         return true;
+    }
+
+    public static boolean inStrictMode() {
+        return strictMode;
+    }
+
+    public static void setStrictMode(boolean mode) {
+        strictMode = mode;
     }
 
 }

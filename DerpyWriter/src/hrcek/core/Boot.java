@@ -50,24 +50,7 @@ import javax.swing.UIManager;
 public class Boot {
 
     public static void showUsage() {
-        System.out.println("Usage:");
-        System.out.println("java -jar DerpyWriter.jar <arguments>\n");
-        System.out.println("\tArguments:");
-        System.out.println("\t<source files>        plaintext files used for source");
-        System.out.println("\t-a [#]                accuracy (default 1)");
-        System.out.println("\t-c [#]                output count (default 100)");
-        System.out.println("\t-h      --help        display this text");
-        System.out.println("\t-o [FILE]             output file (default stdout, hyphen for stdout)");
-        System.out.println("\t-t [#]                thread count (default 1)");
-        System.out.println("\t-i                    ignore logical punctuation checking.");
-        System.out.println("\t-l [FILE]             load dictionary file.");
-        System.out.println("\t-s [FILE]             save dictionary file.");
-        System.out.println("\t-r                    only read files.");
-        System.out.println("\t-v                    verbose mode");
-        System.out.println("\t-w [#] [FILE]         weight a file relative to the other files");
-        System.out.println("\t-nf                   do not format text");
-        System.out.println("\t-fo <txt,html>        Output text as a format (Default plaintext)");
-        System.out.println("\t-fi <txt,normal,html> Input text as a format (Default normal)");
+        System.out.println(showUsageAsString());
     }
 
     public static String showUsageAsString() {
@@ -91,6 +74,8 @@ public class Boot {
         msg += "\t-nf                   do not format text\n";
         msg += "\t-fo <txt,html>        Output text as a format (Default plaintext)\n";
         msg += "\t-fi <txt,normal,html> Input text as a format (Default normal)\n";
+        msg += "\t-d                    Enable debug mode\n";
+        msg += "\t-st                   Enable strict mode\n";        
 
         return msg;
     }
@@ -101,11 +86,9 @@ public class Boot {
      * @return true if the file can be opened.
      */
     public static boolean isFilenameValid(String file) {
-        final char[] ILLEGAL_CHARACTERS = { '/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':' };
-        for(int i = 0; i<ILLEGAL_CHARACTERS.length; i++)
-        {
-            if(file.contains(Character.toString(ILLEGAL_CHARACTERS[i])))
-            {
+        final char[] ILLEGAL_CHARACTERS = {'/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':'};
+        for (int i = 0; i < ILLEGAL_CHARACTERS.length; i++) {
+            if (file.contains(Character.toString(ILLEGAL_CHARACTERS[i]))) {
                 return false;
             }
         }
@@ -177,23 +160,19 @@ public class Boot {
                     DerpyManager.setAccuracy(Integer.parseInt(args[++i]));
                     DerpyManager.setAccuracy_write(DerpyManager.getAccuracy());
                     if (DerpyManager.getAccuracy() < 0) {
-                        System.out.println("Argument must be a positive integer");
-                        System.exit(0);
+                        DerpyLogger.error("Argument must be a positive integer! (i.e. \"-a 3\")");
                     }
                 } catch (Exception e) {
-                    System.out.println("Argument must be a positive integer");
-                    System.exit(0);
+                    DerpyLogger.error("Argument must be a positive integer! (i.e. \"-a 3\")");
                 }
             } else if (args[i].equals("-c")) {
                 try {
                     DerpyManager.setOutput(Integer.parseInt(args[++i]));
                     if (DerpyManager.getOutput() < 0) {
-                        System.out.println("Argument must be a positive integer");
-                        System.exit(0);
+                        DerpyLogger.error("Argument must be a positive integer! (i.e. \"-c 1000\")");
                     }
                 } catch (Exception e) {
-                    System.out.println("Argument must be a positive integer");
-                    System.exit(0);
+                    DerpyLogger.error("Argument must be a positive integer! (i.e. \"-c 1000\")");
                 }
             } else if (args[i].equals("-h") || args[i].equals("--help")) {
                 showUsage();
@@ -218,12 +197,10 @@ public class Boot {
                 try {
                     DerpyManager.setThreads(Integer.parseInt(args[++i]));
                     if (DerpyManager.getThreads() < 1) {
-                        System.out.println("Argument must be a positive integer greater than 1");
-                        System.exit(0);
+                        DerpyLogger.error("Argument must be a positive integer greater than 1! (i.e. \"-t 2\")");
                     }
                 } catch (Exception e) {
-                    System.out.println("Argument must be a positive integer greater than 1");
-                    System.exit(0);
+                    DerpyLogger.error("Argument must be a positive integer greater than 1! (i.e. \"-t 2\")");
                 }
             } else if (args[i].equals("-i")) {
                 DerpyManager.setIgnorePunctuation(true);
@@ -233,8 +210,7 @@ public class Boot {
                 try {
                     int weight = Integer.parseInt(args[++i]);
                     if (weight <= 0) {
-                        System.out.println("Argument must be a positive integer");
-                        System.exit(0);
+                        DerpyLogger.error("Argument must be a positive integer! (i.e. \"-w 1 [filename]\")");
                     } else {
                         ++i;
                         DerpyManager.setThreadable(false);
@@ -262,13 +238,11 @@ public class Boot {
                             DerpyManager.getSources().add("*STDIN*");
                             DerpyManager.getWeights().add(weight);
                         } else {
-                            System.out.println("Invalid filename: " + args[i]);
-                            System.exit(0);
+                            DerpyLogger.error("Invalid filename: " + args[i]);
                         }
                     }
                 } catch (Exception e) {
-                    System.out.println("Argument must be a positive integer");
-                    System.exit(0);
+                    DerpyLogger.error("Argument must be a positive integer! (i.e. \"-w 1 [filename]\")");
                 }
             } else if (args[i].equals("-fo")) {
                 i++;
@@ -290,6 +264,10 @@ public class Boot {
                     DerpyManager.setFileInputFormat(DerpyFormatter.DERPY_FORMAT_TEXT);
                 }
 
+            } else if (args[i].equals("-d")) {
+                DerpyLogger.setDebugMode(true);
+            } else if (args[i].equals("-st")) {
+                DerpyManager.setStrictMode(true);
             } else {
                 // Assume a relative path if not absolute
                 if (isFilenameValid(args[i])) {
@@ -316,8 +294,8 @@ public class Boot {
                     DerpyManager.getSources().add("*STDIN*");
                     DerpyManager.getWeights().add(1);
                 } else {
-                    System.out.println("Invalid filename: " + args[i]);
-                    System.exit(0);
+
+                    DerpyLogger.error("Invalid filename: " + args[i]);
                 }
             }
         }
