@@ -1,1 +1,9 @@
 language: java
+
+jdk:
+  - oraclejdk8
+  - openjdk8
+
+script:
+  - cd DerpyWriter
+  - ant test
