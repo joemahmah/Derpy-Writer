@@ -86,7 +86,7 @@ public class Boot {
      * @return true if the file can be opened.
      */
     public static boolean isFilenameValid(String file) {
-        final char[] ILLEGAL_CHARACTERS = {'/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':'};
+        final char[] ILLEGAL_CHARACTERS = {'\n', '\r', '\t', '\0', '\f', '`', '?', '*', '<', '>', '|', '\"', ':'};
         for (int i = 0; i < ILLEGAL_CHARACTERS.length; i++) {
             if (file.contains(Character.toString(ILLEGAL_CHARACTERS[i]))) {
                 return false;
